@@ -1,0 +1,55 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^7.1",
+        "php-ai/php-ml": "^0.4.1",
+        "symfony/console": "^3.3",
+        "symfony/flex": "^1.0",
+        "symfony/framework-bundle": "^3.3",
+        "symfony/yaml": "^3.3"
+    },
+    "require-dev": {
+        "symfony/dotenv": "^3.3"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/App",
+            "Obokaman\\StockForecast\\": "src/StockForecast"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Obokaman\\StocksForecastTests\\": "test/StockForecast"
+        }
+    },
+    "scripts": {
+        "auto-scripts": {
+            "make cache-warmup": "script",
+            "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*",
+        "symfony/twig-bundle": "<3.3",
+        "symfony/debug": "<3.3"
+    },
+    "extra": {
+        "symfony": {
+            "id": "01BT3KC35BSMP1P2J357JP4Z3Q",
+            "allow-contrib": false
+        }
+    }
+}
