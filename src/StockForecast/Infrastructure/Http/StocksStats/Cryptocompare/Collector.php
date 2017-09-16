@@ -13,11 +13,11 @@ class Collector implements CollectorContract
 
     public function getStats(
         Currency $a_currency,
-        Stock $a_stock_code,
-        int $quantity
+        Stock $a_stock,
+        int $previous_days_to_collect
     ): array
     {
-        $api_url     = sprintf(self::API_URL, $a_stock_code, $a_currency, $quantity - 1);
+        $api_url     = sprintf(self::API_URL, $a_stock, $a_currency, $previous_days_to_collect - 1);
         $response    = $this->collectStockInformationFromRemoteApi($api_url);
         $stats_array = [];
 
@@ -25,7 +25,7 @@ class Collector implements CollectorContract
         {
             $stats_array[] = new StockStats(
                 $a_currency,
-                $a_stock_code,
+                $a_stock,
                 (new \DateTimeImmutable())->setTimestamp($stats['time']),
                 $stats['close'],
                 $stats['high'],

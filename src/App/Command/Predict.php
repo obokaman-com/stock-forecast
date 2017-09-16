@@ -3,7 +3,6 @@
 namespace App\Command;
 
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
-use Obokaman\StockForecast\Application\Service\PredictStockValueResponse;
 use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;

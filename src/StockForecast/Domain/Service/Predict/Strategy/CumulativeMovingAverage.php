@@ -28,11 +28,11 @@ final class CumulativeMovingAverage implements PredictionStrategy
 
     public function predictNext(int $quantity = 1)
     {
-        $last_average = 0;
-
+        $last_average                             = 0;
         $normalized_by_cumulative_average_samples = [];
+        $number_of_measurements                   = sizeof($this->data_sequence);
 
-        for ($i = 0; $i < sizeof($this->data_sequence); $i++)
+        for ($i = 0; $i < $number_of_measurements; $i++)
         {
             $last_average                               = $this->cumulativeMovingAverage($this->data_sequence[$i], $last_average, $i + 1);
             $normalized_by_cumulative_average_samples[] = $last_average;
