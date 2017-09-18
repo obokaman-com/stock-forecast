@@ -24,27 +24,25 @@ final class PredictStockValue
 
     public function predict(PredictStockValueRequest $a_request)
     {
-        $real_stats_array = $this->getStatsArray($a_request);
-        $all_targets      = $this->buildSamplesAndTargets($real_stats_array);
+        $sample_data = $this->getSampleData($a_request);
+        $targets     = $this->getTargets($sample_data);
 
-        /** @var StockStats[] $last_days_real_stats_array */
-        $last_days_real_stats_array = array_slice($real_stats_array, -3, 3);
-        $last_day_datetime          = (end($last_days_real_stats_array))->timestamp();
+        $last_day_datetime = (end($sample_data))->timestamp();
 
-        $forecast_stats_array = $this->getForecast($a_request->currency(), $a_request->stock(), $last_day_datetime, $all_targets, $a_request->daysToForecast());
+        $forecast_stats_array = $this->getForecast($a_request->currency(), $a_request->stock(), $last_day_datetime, $targets, $a_request->daysToForecast());
 
-        return new PredictStockValueResponse($last_days_real_stats_array, $forecast_stats_array);
+        return new PredictStockValueResponse($sample_data, $forecast_stats_array);
     }
 
     /**
-     * @param StockStats[] $real_stats_array
+     * @param StockStats[] $sample_data
      *
      * @return array
      */
-    private function buildSamplesAndTargets(array $real_stats_array): array
+    private function getTargets(array $sample_data): array
     {
         $all_targets = [];
-        foreach ($real_stats_array as $stats)
+        foreach ($sample_data as $stats)
         {
             $all_targets['close'][]       = $stats->close();
             $all_targets['high'][]        = $stats->high();
@@ -57,7 +55,7 @@ final class PredictStockValue
         return $all_targets;
     }
 
-    private function getStatsArray(PredictStockValueRequest $a_request)
+    private function getSampleData(PredictStockValueRequest $a_request)
     {
         $real_stats_array = $this->stock_stats_collector->getStats(
             $a_request->currency(),

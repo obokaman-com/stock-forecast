@@ -67,9 +67,19 @@ final class StockStats
         return round($this->low, 2);
     }
 
+    public function volatility()
+    {
+        return round($this->high - $this->low, 2);
+    }
+
     public function open()
     {
         return round($this->open, 2);
+    }
+
+    public function change()
+    {
+        return round($this->close - $this->open, 2);
     }
 
     public function volumeFrom()
@@ -80,5 +90,10 @@ final class StockStats
     public function volumeTo()
     {
         return round($this->volume_to, 2);
+    }
+
+    public function volume()
+    {
+        return round($this->volume_to - $this->volume_from, 2);
     }
 }

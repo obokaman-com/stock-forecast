@@ -55,8 +55,11 @@ class StockStatsTest extends TestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $this->stock_stats->timestamp());
         $this->assertInternalType('float', $this->stock_stats->open());
         $this->assertInternalType('float', $this->stock_stats->close());
+        $this->assertInternalType('float', $this->stock_stats->change());
         $this->assertInternalType('float', $this->stock_stats->high());
         $this->assertInternalType('float', $this->stock_stats->low());
+        $this->assertInternalType('float', $this->stock_stats->volatility());
+        $this->assertInternalType('float', $this->stock_stats->volume());
         $this->assertInternalType('float', $this->stock_stats->volumeFrom());
         $this->assertInternalType('float', $this->stock_stats->volumeTo());
     }

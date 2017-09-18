@@ -8,7 +8,7 @@ use Phpml\SupportVectorMachine\Kernel;
 
 final class SupportVectorRegression extends PredictionStrategy implements SupportVectorRegressionContract
 {
-    private const REGRESSION_STRATEGY = Kernel::LINEAR;
+    private const REGRESSION_STRATEGY = Kernel::POLYNOMIAL;
 
     protected function getMlLibrary()
     {

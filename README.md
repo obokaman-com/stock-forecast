@@ -2,11 +2,13 @@
 
 This is a very simple initial version of the app.
 
-You can try it with `bin/console stocks:predict <base_currency> <stock/crypto code> <historical days to collect> <days to foresee>`
+You can try it with `bin/console forecast:stock <base_currency> <stock/crypto code> <historical days to collect> <days to foresee>`
 
 Example: `bin/console stocks:predict USD BTC 60 5` 
 
 This will generate a table with the prevision for the next 5 days based in the last 60 days of historical data.
+
+There is a `forecast:test` command too that allow you to test different predicition strategies with sample sequences.
 
 At this moment it only can use some linear algorithms, SquareLevels, Support Vector Regression and a basic linear regression based on Cumulative Moving Averages.
 

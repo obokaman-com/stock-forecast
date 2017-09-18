@@ -46,7 +46,7 @@ abstract class PredictionStrategy implements PredictionStrategyContract
             {
                 return [$sequence];
             },
-            range(count($this->data_sequence), count($this->data_sequence) - 1 + $quantity)
+            range(count($this->data_sequence) + 1, count($this->data_sequence) + $quantity)
         );
 
         return $this->php_ml->predict($prediction_sample);

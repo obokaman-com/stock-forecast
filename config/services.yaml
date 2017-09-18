@@ -21,11 +21,6 @@ services:
     Obokaman\StockForecast\:
         resource: '../src/StockForecast/*'
 
-    # force public visibility of this Application Service
-    obokaman.stock.forecast.predict:
-        class: Obokaman\StockForecast\Application\Service\PredictStockValue
-        public: true
-
     # Define an alias for this interface, so we can take profit of autowire to change the
     # implementation we want to use for the prediction strategy.
     #Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Domain\Service\Predict\Strategy\CumulativeMovingAverage'

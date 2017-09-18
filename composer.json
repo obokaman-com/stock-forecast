@@ -1,6 +1,6 @@
 {
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "require": {
         "php": "^7.1",
         "php-ai/php-ml": "^0.4.1",
@@ -10,7 +10,9 @@
         "symfony/yaml": "^3.3"
     },
     "require-dev": {
-        "symfony/dotenv": "^3.3"
+        "phpunit/phpunit": "^6.3",
+        "symfony/dotenv": "^3.3",
+        "symfony/var-dumper": "^3.3"
     },
     "config": {
         "preferred-install": {
@@ -26,7 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Obokaman\\StocksForecastTests\\": "test/StockForecast"
+            "Obokaman\\StocksForecast\\": "test/StockForecast"
         }
     },
     "scripts": {

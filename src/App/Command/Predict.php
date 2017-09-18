@@ -2,23 +2,35 @@
 
 namespace App\Command;
 
+use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
 use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class Predict extends ContainerAwareCommand
+final class Predict extends Command
 {
+    private const MAX_REAL_STATS_QUANTITY_OUTPUT = 3;
+
     private $stock_predict_service;
+
+    public function __construct(PredictStockValue $a_stock_predict_service)
+    {
+        $this->stock_predict_service = $a_stock_predict_service;
+
+        parent::__construct();
+    }
 
     protected function configure()
     {
-        $this->setName('stocks:predict')
-            ->setDescription('Predict a stock future value.')
-            ->setHelp('This command allow you to predict a stock future value...')
+        $this->setName('forecast:stock')
+            ->setDescription('Generates a forecast of stock future prices.')
+            ->setHelp(
+                'This command allow you to predict a stock future value...'
+            )
             ->addArgument('currency', InputArgument::OPTIONAL, 'The currency code.', 'USD')
             ->addArgument('stock', InputArgument::OPTIONAL, 'The stock code.', 'BTC')
             ->addArgument('days_to_collect', InputArgument::OPTIONAL, 'The days to recover from stats.', '10')
@@ -27,8 +39,6 @@ final class Predict extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->stock_predict_service = $this->getContainer()->get('obokaman.stock.forecast.predict');
-
         $this->outputCommandTitle($input, $output);
 
         $prediction_response = $this->stock_predict_service->predict(
@@ -38,7 +48,10 @@ final class Predict extends ContainerAwareCommand
         );
 
         $output->writeln('<options=bold>Last real measurements:</>');
-        $this->outputMeasurementsTable($output, $prediction_response->lastDaysRealStatsArray());
+        $this->outputMeasurementsTable(
+            $output,
+            array_slice($prediction_response->realStatsArray(), -self::MAX_REAL_STATS_QUANTITY_OUTPUT, self::MAX_REAL_STATS_QUANTITY_OUTPUT)
+        );
 
         $output->writeln('<options=bold>Forecast for next few days:</>');
         $this->outputMeasurementsTable($output, $prediction_response->forecastStatsArray());
@@ -60,7 +73,7 @@ final class Predict extends ContainerAwareCommand
     private function outputMeasurementsTable(OutputInterface $output, array $measurements): void
     {
         $table = new Table($output);
-        $table->setHeaders(['Date', 'Open', 'Close', 'High', 'Low', 'Volume from', 'Volume to']);
+        $table->setHeaders(['Date', 'Open', 'Close', 'Change', 'High', 'Low', 'Volatility', 'Volume']);
 
         /** @var StockStats $stock_stats */
         foreach ($measurements as $stock_stats)
@@ -70,10 +83,11 @@ final class Predict extends ContainerAwareCommand
                     $stock_stats->timestamp()->format('Y-m-d'),
                     $stock_stats->open(),
                     $stock_stats->close(),
+                    $stock_stats->change(),
                     $stock_stats->high(),
                     $stock_stats->low(),
-                    $stock_stats->volumeFrom(),
-                    $stock_stats->volumeTo()
+                    $stock_stats->volatility(),
+                    $stock_stats->volume()
                 ]
             );
         }
