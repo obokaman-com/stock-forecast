@@ -2,12 +2,41 @@
 
 This is a very simple initial version of the app.
 
-You can try it with `bin/console forecast:stock <base_currency> <stock/crypto code> <date_interval_magnitude (minutes/hours/days)>`
+At this moment it only can use some linear algorithms, SquareLevels, Support Vector Regression and a basic linear regression based on Cumulative Moving Averages.
 
-**Example:** 
+Next steps: 
+* apply something more sophisticated as prediction algorithm, being able to make a complete technical analysis of the stock historical values.
+* gather information about the stock from Twitter and financial news, to build a sentiment graph around the stock, to affect the predictions.
+* apply some ML to find patterns between the stock value evolution and other stocks in the same segment, to affect the predictions.
+* ...¿?
+
+## Installation
+
+**Install PHP 7.2 and Git in your local machine** *(Example for Mac)*
+
+Install Homebrew (package manager) if you don't have it yet, and install Git + PHP 7.2 + Composer:
 
 ```bash
-bin/console forecast:stock USD BTC days
+$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)`
+$ brew install git php72 php72-xdebug composer
+```
+
+**Download app and install all dependencies**
+
+```bash
+$ git clone https://github.com/obokaman-com/stock-forecast
+$ cd stock-forecast
+$ composer install
+```
+
+## Example
+
+You can try it with `bin/console forecast:stock <base_currency> <stock/crypto code> <date_interval_magnitude (minutes/hours/days)>`
+
+#### Forecast  
+
+```bash
+$ bin/console forecast:stock USD BTC days
 ``` 
 
 This will generate a table with the historical price information and a prevision for the next day based in the last 30 days of historical data, giving you three estimations, based on short-term (5 days), medium-term (15 days) and long-term (30 days).
@@ -41,10 +70,3 @@ Forecast for next days:
 
 There is a `forecast:test` command too that allow you to test different predicition strategies with sample sequences.
 
-At this moment it only can use some linear algorithms, SquareLevels, Support Vector Regression and a basic linear regression based on Cumulative Moving Averages.
-
-Next steps: 
-* apply something more sophisticated as prediction algorithm, being able to make a complete technical analysis of the stock historical values.
-* gather information about the stock from Twitter and financial news, to build a sentiment graph around the stock, to affect the predictions.
-* apply some ML to find patterns between the stock value evolution and other stocks in the same segment, to affect the predictions.
-* ...¿?

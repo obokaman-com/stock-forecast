@@ -28,13 +28,14 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Obokaman\\StocksForecast\\": "test/StockForecast"
+            "Obokaman\\StocksForecast\\": "tests/StockForecast"
         }
     },
     "scripts": {
         "auto-scripts": {
             "make cache-warmup": "script",
-            "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
+            "cache:clear": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
