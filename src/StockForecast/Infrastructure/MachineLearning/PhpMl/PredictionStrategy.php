@@ -18,7 +18,7 @@ abstract class PredictionStrategy implements PredictionStrategyContract
         $this->php_ml = $this->getMlLibrary();
     }
 
-    public function resetTraining()
+    public function resetTraining(): void
     {
         $this->data_sequence = null;
         $this->php_ml        = $this->getMlLibrary();
@@ -33,7 +33,7 @@ abstract class PredictionStrategy implements PredictionStrategyContract
             {
                 return [$sequence];
             },
-            range(1, count($this->data_sequence))
+            range(1, \count($this->data_sequence))
         );
 
         $this->php_ml->train($sample_range, $data_sequence);
@@ -46,7 +46,7 @@ abstract class PredictionStrategy implements PredictionStrategyContract
             {
                 return [$sequence];
             },
-            range(count($this->data_sequence) + 1, count($this->data_sequence) + $quantity)
+            range(\count($this->data_sequence) + 1, \count($this->data_sequence) + $quantity)
         );
 
         return $this->php_ml->predict($prediction_sample);

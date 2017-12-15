@@ -11,9 +11,9 @@ final class Stock
         $this->code = $a_code;
     }
 
-    public static function fromCode(string $a_code)
+    public static function fromCode(string $a_code): Stock
     {
-        $a_code = mb_strtoupper($a_code);
+        $a_code = strtoupper($a_code);
 
         return new self($a_code);
     }

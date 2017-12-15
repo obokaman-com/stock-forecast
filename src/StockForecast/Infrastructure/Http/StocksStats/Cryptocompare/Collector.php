@@ -4,20 +4,18 @@ namespace Obokaman\StockForecast\Infrastructure\Http\StocksStats\Cryptocompare;
 
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock;
+use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
 use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
 use Obokaman\StockForecast\Infrastructure\Http\StocksStats\Collector as CollectorContract;
 
 class Collector implements CollectorContract
 {
-    private const API_URL = 'https://min-api.cryptocompare.com/data/histoday?fsym=%s&tsym=%s&limit=%d&aggregate=1';
+    private const API_URL = 'https://min-api.cryptocompare.com/data/%s?fsym=%s&tsym=%s&limit=%d&aggregate=1';
 
-    public function getStats(
-        Currency $a_currency,
-        Stock $a_stock,
-        int $previous_days_to_collect
-    ): array
+    public function getStats(Currency $a_currency, Stock $a_stock, StockDateInterval $a_date_interval): array
     {
-        $api_url     = sprintf(self::API_URL, $a_stock, $a_currency, $previous_days_to_collect - 1);
+        $api_method  = $this->getApiMethodForInterval($a_date_interval);
+        $api_url     = sprintf(self::API_URL, $api_method, $a_stock, $a_currency, CollectorContract::LONG_INTERVAL - 1);
         $response    = $this->collectStockInformationFromRemoteApi($api_url);
         $stats_array = [];
 
@@ -27,10 +25,10 @@ class Collector implements CollectorContract
                 $a_currency,
                 $a_stock,
                 (new \DateTimeImmutable())->setTimestamp($stats['time']),
+                $stats['open'],
                 $stats['close'],
                 $stats['high'],
                 $stats['low'],
-                $stats['open'],
                 $stats['volumefrom'],
                 $stats['volumeto']
             );
@@ -41,8 +39,24 @@ class Collector implements CollectorContract
 
     protected function collectStockInformationFromRemoteApi(string $api_url): array
     {
-        $response = json_decode(file_get_contents($api_url), true);
+        return json_decode(file_get_contents($api_url), true) ?: [];
+    }
 
-        return $response;
+    private function getApiMethodForInterval(StockDateInterval $a_date_interval)
+    {
+        if ($a_date_interval->isDays())
+        {
+            return 'histoday';
+        }
+
+        if ($a_date_interval->isHours())
+        {
+            return 'histohour';
+        }
+
+        if ($a_date_interval->isMinutes())
+        {
+            return 'histominute';
+        }
     }
 }

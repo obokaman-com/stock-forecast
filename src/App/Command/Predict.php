@@ -13,8 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class Predict extends Command
 {
-    private const MAX_REAL_STATS_QUANTITY_OUTPUT = 3;
-
     private $stock_predict_service;
 
     public function __construct(PredictStockValue $a_stock_predict_service)
@@ -24,7 +22,7 @@ final class Predict extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('forecast:stock')
             ->setDescription('Generates a forecast of stock future prices.')
@@ -33,57 +31,61 @@ final class Predict extends Command
             )
             ->addArgument('currency', InputArgument::OPTIONAL, 'The currency code.', 'USD')
             ->addArgument('stock', InputArgument::OPTIONAL, 'The stock code.', 'BTC')
-            ->addArgument('days_to_collect', InputArgument::OPTIONAL, 'The days to recover from stats.', '10')
-            ->addArgument('days_to_forecast', InputArgument::OPTIONAL, 'The days to predict in the forecast.', '3');
+            ->addArgument('date_interval', InputArgument::OPTIONAL, 'The date interval to use in the forecast (minutes, hours, days).', 'days');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->outputCommandTitle($input, $output);
 
-        $prediction_response = $this->stock_predict_service->predict(
-            new PredictStockValueRequest(
-                $input->getArgument('currency'), $input->getArgument('stock'), $input->getArgument('days_to_collect'), $input->getArgument('days_to_forecast')
-            )
+        $prediction_request = new PredictStockValueRequest(
+            $input->getArgument('currency'),
+            $input->getArgument('stock'),
+            $input->getArgument('date_interval')
         );
+
+        $prediction_response = $this->stock_predict_service->predict($prediction_request);
 
         $output->writeln('<options=bold>Last real measurements:</>');
-        $this->outputMeasurementsTable(
-            $output,
-            array_slice($prediction_response->realStatsArray(), -self::MAX_REAL_STATS_QUANTITY_OUTPUT, self::MAX_REAL_STATS_QUANTITY_OUTPUT)
-        );
+        $this->outputStatsTable($output, $prediction_response->realStatsArray());
 
-        $output->writeln('<options=bold>Forecast for next few days:</>');
-        $this->outputMeasurementsTable($output, $prediction_response->forecastStatsArray());
+        $output->writeln('<options=bold>Forecast for next ' . $input->getArgument('date_interval') . ':</>');
+        $this->outputForecastTable(
+            $output,
+            $prediction_response->shortTermStats(),
+            $prediction_response->mediumTermStats(),
+            $prediction_response->longTermStats()
+        );
     }
 
     private function outputCommandTitle(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln(
             sprintf(
-                '<options=bold>===== BUILDING FORECAST FOR <info>%s - %s</info> USING DATA FROM LAST %d DAYS =====</>',
+                '<options=bold>===== BUILDING FORECAST FOR <info>%s - %s</info> USING DATA FROM LAST 30 %s =====</>',
                 $input->getArgument('stock'),
                 $input->getArgument('currency'),
-                $input->getArgument('days_to_collect')
+                $input->getArgument('date_interval')
             )
         );
         $output->writeln('');
     }
 
-    private function outputMeasurementsTable(OutputInterface $output, array $measurements): void
+    private function outputStatsTable(OutputInterface $output, array $measurements): void
     {
         $table = new Table($output);
-        $table->setHeaders(['Date', 'Open', 'Close', 'Change', 'High', 'Low', 'Volatility', 'Volume']);
+        $table->setHeaders(['Date', 'Open', 'Close', 'Change', 'Change (%)', 'High', 'Low', 'Volatility', 'Volume']);
 
         /** @var StockStats $stock_stats */
         foreach ($measurements as $stock_stats)
         {
             $table->addRow(
                 [
-                    $stock_stats->timestamp()->format('Y-m-d'),
+                    $stock_stats->timestamp()->format('Y-m-d H:i'),
                     $stock_stats->open(),
                     $stock_stats->close(),
                     $stock_stats->change(),
+                    $stock_stats->changePercent(),
                     $stock_stats->high(),
                     $stock_stats->low(),
                     $stock_stats->volatility(),
@@ -93,5 +95,35 @@ final class Predict extends Command
         }
         $table->render();
         $output->writeln('');
+    }
+
+    private function outputForecastTable(OutputInterface $output, StockStats ...$stock_stats)
+    {
+        $table = new Table($output);
+        $table->setHeaders(['Date interval', 'Open', 'Close', 'Change', 'Change (%)', 'High', 'Low', 'Volatility', 'Volume']);
+
+        $this->addTableRow($table, 'Short term', $stock_stats[0]);
+        $this->addTableRow($table, 'Medium term', $stock_stats[1]);
+        $this->addTableRow($table, 'Long term', $stock_stats[2]);
+
+        $table->render();
+        $output->writeln('');
+    }
+
+    private function addTableRow(Table $table, string $label, StockStats $stats): void
+    {
+        $table->addRow(
+            [
+                $label,
+                $stats->open(),
+                $stats->close(),
+                $stats->change(),
+                $stats->changePercent(),
+                $stats->high(),
+                $stats->low(),
+                $stats->volatility(),
+                $stats->volume()
+            ]
+        );
     }
 }

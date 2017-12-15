@@ -4,6 +4,7 @@ namespace Obokaman\StockForecast\Infrastructure\Http\StocksStats\Cryptocompare;
 
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock;
+use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
 use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +26,7 @@ class CollectorTest extends TestCase
         $this->stock_stats_array = $this->collector->getStats(
             Currency::fromCode('USD'),
             Stock::fromCode('BTC'),
-            10
+            StockDateInterval::fromStringDateInterval('days')
         );
     }
 
@@ -42,13 +43,13 @@ class CollectorTestClass extends Collector
         $results = [
             'Data' => [
                 [
-                    "time"       => 1504656000,
-                    "close"      => 4616.18,
-                    "high"       => 4692,
-                    "low"        => 4431,
-                    "open"       => 4432.51,
-                    "volumefrom" => 15975.31,
-                    "volumeto"   => 73082808.58
+                    'time'       => 1504656000,
+                    'close'      => 4616.18,
+                    'high'       => 4692,
+                    'low'        => 4431,
+                    'open'       => 4432.51,
+                    'volumefrom' => 15975.31,
+                    'volumeto'   => 73082808.58
                 ]
 
             ]

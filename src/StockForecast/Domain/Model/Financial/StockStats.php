@@ -18,10 +18,10 @@ final class StockStats
         Currency $a_currency,
         Stock $a_stock,
         \DateTimeImmutable $a_timestamp,
+        float $an_open,
         float $a_close,
         float $a_high,
         float $a_low,
-        float $an_open,
         float $a_volume_from,
         float $a_volume_to
     )
@@ -54,46 +54,66 @@ final class StockStats
 
     public function close()
     {
-        return round($this->close, 2);
+        return $this->sensitiveRound($this->close);
     }
 
     public function high()
     {
-        return round($this->high, 2);
+        return $this->sensitiveRound($this->high);
     }
 
     public function low()
     {
-        return round($this->low, 2);
+        return $this->sensitiveRound($this->low);
     }
 
     public function volatility()
     {
-        return round($this->high - $this->low, 2);
+        return $this->sensitiveRound($this->high - $this->low);
     }
 
     public function open()
     {
-        return round($this->open, 2);
+        return $this->sensitiveRound($this->open);
     }
 
     public function change()
     {
-        return round($this->close - $this->open, 2);
+        return $this->sensitiveRound($this->close - $this->open);
+    }
+
+    public function changePercent(): string
+    {
+        return $this->sensitiveRound((($this->close / $this->open) - 1) * 100) . '%';
     }
 
     public function volumeFrom()
     {
-        return round($this->volume_from, 2);
+        return $this->sensitiveRound($this->volume_from);
     }
 
     public function volumeTo()
     {
-        return round($this->volume_to, 2);
+        return $this->sensitiveRound($this->volume_to);
     }
 
     public function volume()
     {
-        return round($this->volume_to - $this->volume_from, 2);
+        return $this->sensitiveRound($this->volume_to - $this->volume_from);
+    }
+
+    private function sensitiveRound(float $amount)
+    {
+        if (0.001 > abs($amount))
+        {
+            return round($amount, 4);
+        }
+
+        if (0.01 > abs($amount))
+        {
+            return round($amount, 3);
+        }
+
+        return round($amount, 2);
     }
 }

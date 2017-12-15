@@ -1,0 +1,5 @@
+{
+    "symfony/polyfill-php72": {
+        "version": "v1.6.0"
+    }
+}
