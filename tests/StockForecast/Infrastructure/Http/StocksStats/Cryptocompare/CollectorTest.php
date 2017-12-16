@@ -41,17 +41,14 @@ class CollectorTestClass extends Collector
     protected function collectStockInformationFromRemoteApi(string $api_url): array
     {
         $results = [
-            'Data' => [
-                [
-                    'time'       => 1504656000,
-                    'close'      => 4616.18,
-                    'high'       => 4692,
-                    'low'        => 4431,
-                    'open'       => 4432.51,
-                    'volumefrom' => 15975.31,
-                    'volumeto'   => 73082808.58
-                ]
-
+            [
+                'time'       => 1504656000,
+                'close'      => 4616.18,
+                'high'       => 4692,
+                'low'        => 4431,
+                'open'       => 4432.51,
+                'volumefrom' => 15975.31,
+                'volumeto'   => 73082808.58
             ]
         ];
 

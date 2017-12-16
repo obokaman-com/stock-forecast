@@ -37,17 +37,17 @@ final class StockStats
         $this->volume_to   = $a_volume_to;
     }
 
-    public function currency()
+    public function currency(): Currency
     {
         return $this->currency;
     }
 
-    public function stock()
+    public function stock(): Stock
     {
         return $this->stock;
     }
 
-    public function timestamp()
+    public function timestamp(): \DateTimeImmutable
     {
         return $this->timestamp;
     }

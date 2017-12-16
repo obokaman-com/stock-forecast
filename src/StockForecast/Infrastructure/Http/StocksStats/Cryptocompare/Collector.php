@@ -6,6 +6,7 @@ use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock;
 use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
 use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
+use Obokaman\StockForecast\Infrastructure\Http\StocksStats\CollectException;
 use Obokaman\StockForecast\Infrastructure\Http\StocksStats\Collector as CollectorContract;
 
 class Collector implements CollectorContract
@@ -19,7 +20,7 @@ class Collector implements CollectorContract
         $response    = $this->collectStockInformationFromRemoteApi($api_url);
         $stats_array = [];
 
-        foreach ($response['Data'] as $stats)
+        foreach ($response as $stats)
         {
             $stats_array[] = new StockStats(
                 $a_currency,
@@ -39,7 +40,19 @@ class Collector implements CollectorContract
 
     protected function collectStockInformationFromRemoteApi(string $api_url): array
     {
-        return json_decode(file_get_contents($api_url), true) ?: [];
+        $response = json_decode(file_get_contents($api_url), true) ?: [];
+
+        if (empty($response))
+        {
+            throw new CollectException();
+        }
+
+        if (empty($response['Data']))
+        {
+            throw new CollectException($response['Message'] ?? null);
+        }
+
+        return $response['Data'];
     }
 
     private function getApiMethodForInterval(StockDateInterval $a_date_interval)
@@ -58,5 +71,7 @@ class Collector implements CollectorContract
         {
             return 'histominute';
         }
+
+        throw new \UnexpectedValueException('Unknown given date interval: ' . $a_date_interval->interval());
     }
 }

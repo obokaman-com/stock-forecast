@@ -21,7 +21,7 @@ final class CumulativeMovingAverage implements PredictionStrategy
         $this->data_sequence = $data_sequence;
     }
 
-    public function resetTraining()
+    public function resetTraining(): void
     {
         $this->data_sequence = null;
     }
@@ -30,7 +30,7 @@ final class CumulativeMovingAverage implements PredictionStrategy
     {
         $last_average                             = 0;
         $normalized_by_cumulative_average_samples = [];
-        $number_of_measurements                   = sizeof($this->data_sequence);
+        $number_of_measurements                   = \count($this->data_sequence);
 
         for ($i = 0; $i < $number_of_measurements; $i++)
         {
@@ -38,7 +38,7 @@ final class CumulativeMovingAverage implements PredictionStrategy
             $normalized_by_cumulative_average_samples[] = $last_average;
         }
 
-        if (1 == $quantity)
+        if (1 === $quantity)
         {
             return [$last_average];
         }

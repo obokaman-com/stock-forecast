@@ -14,6 +14,15 @@ final class PredictStockValue
     /** @var PredictionStrategy */
     private $prediction_strategy;
 
+    /** @var PredictStockValueRequest */
+    private $request;
+
+    /** @var array */
+    private $sample_data;
+
+    /** @var array */
+    private $targets;
+
     public function __construct(Collector $a_stock_stats_collector, PredictionStrategy $a_prediction_strategy)
     {
         $this->stock_stats_collector = $a_stock_stats_collector;
@@ -22,46 +31,35 @@ final class PredictStockValue
 
     public function predict(PredictStockValueRequest $a_request): PredictStockValueResponse
     {
-        $sample_data      = $this->getSampleData($a_request);
-        $targets          = $this->getTargets($sample_data);
-        $last_measurement = end($sample_data);
+        $this->request     = $a_request;
+        $this->sample_data = $this->getSampleData();
+        $this->targets     = $this->getTargets();
 
-        $short_term_targets  = array_map(
-            function ($target) {
-                return \array_slice($target, -Collector::SHORT_INTERVAL, Collector::SHORT_INTERVAL);
-            },
-            $targets
-        );
-        $short_term_forecast = $this->getForecast($a_request, $short_term_targets, $last_measurement);
+        $short_term_forecast  = $this->getForecastForDateInterval(Collector::SHORT_INTERVAL);
+        $medium_term_forecast = $this->getForecastForDateInterval(Collector::MEDIUM_INTERVAL);
+        $long_term_forecast   = $this->getForecastForDateInterval(Collector::LONG_INTERVAL);
 
-        $medium_term_targets  = array_map(
-            function ($target) {
-                return \array_slice($target, -Collector::MEDIUM_INTERVAL, Collector::MEDIUM_INTERVAL);
-            },
-            $targets
-        );
-        $medium_term_forecast = $this->getForecast($a_request, $medium_term_targets, $last_measurement);
-
-        $long_term_targets  = array_map(
-            function ($target) {
-                return \array_slice($target, -Collector::LONG_INTERVAL, Collector::LONG_INTERVAL);
-            },
-            $targets
-        );
-        $long_term_forecast = $this->getForecast($a_request, $long_term_targets, $last_measurement);
-
-        return new PredictStockValueResponse($sample_data, $short_term_forecast, $medium_term_forecast, $long_term_forecast);
+        return new PredictStockValueResponse($this->sample_data, $short_term_forecast, $medium_term_forecast, $long_term_forecast);
     }
 
     /**
-     * @param StockStats[] $sample_data
-     *
-     * @return array
+     * @return StockStats[]
      */
-    private function getTargets(array $sample_data): array
+    private function getSampleData(): array
+    {
+        $real_stats_array = $this->stock_stats_collector->getStats(
+            $this->request->currency(),
+            $this->request->stock(),
+            $this->request->dateInterval()
+        );
+
+        return $real_stats_array;
+    }
+
+    private function getTargets(): array
     {
         $all_targets = [];
-        foreach ($sample_data as $stats)
+        foreach ($this->sample_data as $stats)
         {
             $all_targets['change'][]      = $stats->change();
             $all_targets['high'][]        = $stats->high();
@@ -73,20 +71,41 @@ final class PredictStockValue
         return $all_targets;
     }
 
-    /**
-     * @param PredictStockValueRequest $a_request
-     *
-     * @return StockStats[]
-     */
-    private function getSampleData(PredictStockValueRequest $a_request): array
+    private function getForecastForDateInterval(int $date_interval): StockStats
     {
-        $real_stats_array = $this->stock_stats_collector->getStats(
-            $a_request->currency(),
-            $a_request->stock(),
-            $a_request->dateInterval()
+        $filtered_targets = array_map(
+            function ($target) use ($date_interval) {
+                return \array_slice($target, -$date_interval, $date_interval);
+            },
+            $this->targets
         );
 
-        return $real_stats_array;
+        return $this->getForecast($filtered_targets);
+    }
+
+    private function getForecast(array $targets): StockStats
+    {
+        $last_measurement = end($this->sample_data);
+
+        $change_prediction      = $this->predictSelectedTarget($targets['change'], 1);
+        $high_prediction        = $this->predictSelectedTarget($targets['high'], 1);
+        $low_prediction         = $this->predictSelectedTarget($targets['low'], 1);
+        $volume_from_prediction = $this->predictSelectedTarget($targets['volume_from'], 1);
+        $volume_to_prediction   = $this->predictSelectedTarget($targets['volume_to'], 1);
+
+        $stock_stats = new StockStats(
+            $this->request->currency(),
+            $this->request->stock(),
+            $last_measurement->timestamp()->add(\DateInterval::createFromDateString('1 ' . $this->request->dateInterval()->interval())),
+            $last_measurement->close(),
+            $last_measurement->close() + $change_prediction[0],
+            $high_prediction[0],
+            $low_prediction[0],
+            $volume_from_prediction[0],
+            $volume_to_prediction[0]
+        );
+
+        return $stock_stats;
     }
 
     private function predictSelectedTarget(array $targets, int $forecast_sequences_quantity): array
@@ -96,28 +115,5 @@ final class PredictStockValue
         $this->prediction_strategy->resetTraining();
 
         return $prediction;
-    }
-
-    private function getForecast(PredictStockValueRequest $a_request, array $targets, StockStats $last_measurement): StockStats
-    {
-        $change_predition       = $this->predictSelectedTarget($targets['change'], 1);
-        $high_prediction        = $this->predictSelectedTarget($targets['high'], 1);
-        $low_prediction         = $this->predictSelectedTarget($targets['low'], 1);
-        $volume_from_prediction = $this->predictSelectedTarget($targets['volume_from'], 1);
-        $volume_to_prediction   = $this->predictSelectedTarget($targets['volume_to'], 1);
-
-        $stock_stats = new StockStats(
-            $a_request->currency(),
-            $a_request->stock(),
-            $last_measurement->timestamp()->add(\DateInterval::createFromDateString('1 ' . $a_request->dateInterval()->interval())),
-            $last_measurement->close(),
-            $last_measurement->close() + $change_predition[0],
-            $high_prediction[0],
-            $low_prediction[0],
-            $volume_from_prediction[0],
-            $volume_to_prediction[0]
-        );
-
-        return $stock_stats;
     }
 }
