@@ -11,7 +11,7 @@ use TelegramBot\Api\Types\Message as TelegramMessage;
 
 class Webhook
 {
-    public function telegram(string $token)
+    public function telegram(string $token): JsonResponse
     {
         if ($token !== $_SERVER['TELEGRAM_BOT_TOKEN'])
         {
@@ -43,5 +43,7 @@ class Webhook
                 ]
             );
         }
+
+        return new JsonResponse([]);
     }
 }
