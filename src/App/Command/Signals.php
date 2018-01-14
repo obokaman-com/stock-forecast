@@ -8,6 +8,7 @@ use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
 use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
 use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
+use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,7 +22,10 @@ final class Signals extends Command
         ['EUR', 'BTC'],
         ['EUR', 'ETH'],
         ['EUR', 'XRP'],
-        ['EUR', 'LTC']
+        ['EUR', 'LTC'],
+        ['EUR', 'ETC'],
+        ['EUR', 'DASH'],
+        ['EUR', 'BCH']
     ];
     private $stock_predict_service;
     private $get_signals_service;
@@ -123,7 +127,14 @@ final class Signals extends Command
     {
         $prediction_request  = new PredictStockValueRequest($currency, $stock, $interval_unit);
         $prediction_response = $this->stock_predict_service->predict($prediction_request);
-        $this->output->writeln('<options=bold>Signals based on last ' . $interval . ':</>');
+        $signals_request     = new GetSignalsFromForecastRequest(
+            $prediction_response->shortTermStats(),
+            $prediction_response->mediumTermStats(),
+            $prediction_response->longTermStats()
+        );
+        $signals_response    = $this->get_signals_service->getSignals($signals_request);
+
+        $this->output->writeln('<options=bold>Signals based on last ' . $interval . ' (Score: ' . CalculateScore::calculate(...$signals_response) . '):</>');
 
         if ($this->input->getOption('table_output'))
         {
@@ -134,12 +145,6 @@ final class Signals extends Command
             );
         }
 
-        $signals_request  = new GetSignalsFromForecastRequest(
-            $prediction_response->shortTermStats(),
-            $prediction_response->mediumTermStats(),
-            $prediction_response->longTermStats()
-        );
-        $signals_response = $this->get_signals_service->getSignals($signals_request);
         foreach ($signals_response as $signal)
         {
             $this->output->writeln(' - <comment>' . $signal . '</comment>');

@@ -5,6 +5,7 @@ namespace App\Command;
 use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
 use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
+use Obokaman\StockForecast\Infrastructure\Http\StocksStats\Collector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -62,9 +63,10 @@ final class Predict extends Command
     {
         $output->writeln(
             sprintf(
-                '<options=bold>===== BUILDING FORECAST FOR <info>%s - %s</info> USING DATA FROM LAST 30 %s =====</>',
+                '<options=bold>===== BUILDING FORECAST FOR <info>%s - %s</info> USING DATA FROM LAST %d %s =====</>',
                 $input->getArgument('stock'),
                 $input->getArgument('currency'),
+                Collector::LONG_INTERVAL[$input->getArgument('date_interval')],
                 $input->getArgument('date_interval')
             )
         );
