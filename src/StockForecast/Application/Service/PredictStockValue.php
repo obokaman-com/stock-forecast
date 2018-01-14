@@ -35,9 +35,11 @@ final class PredictStockValue
         $this->sample_data = $this->getSampleData();
         $this->targets     = $this->getTargets();
 
-        $short_term_forecast  = $this->getForecastForDateInterval(Collector::SHORT_INTERVAL);
-        $medium_term_forecast = $this->getForecastForDateInterval(Collector::MEDIUM_INTERVAL);
-        $long_term_forecast   = $this->getForecastForDateInterval(Collector::LONG_INTERVAL);
+        $date_interval = $a_request->dateInterval()->interval();
+
+        $short_term_forecast  = $this->getForecastForDateInterval(Collector::SHORT_INTERVAL[$date_interval]);
+        $medium_term_forecast = $this->getForecastForDateInterval(Collector::MEDIUM_INTERVAL[$date_interval]);
+        $long_term_forecast   = $this->getForecastForDateInterval(Collector::LONG_INTERVAL[$date_interval]);
 
         return new PredictStockValueResponse($this->sample_data, $short_term_forecast, $medium_term_forecast, $long_term_forecast);
     }

@@ -9,9 +9,21 @@ use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
 
 interface Collector
 {
-    public const SHORT_INTERVAL = 5;
-    public const MEDIUM_INTERVAL = 15;
-    public const LONG_INTERVAL = 30;
+    public const SHORT_INTERVAL = [
+        StockDateInterval::DAYS => 7,
+        StockDateInterval::HOURS => 6,
+        StockDateInterval::MINUTES => 15
+    ];
+    public const MEDIUM_INTERVAL = [
+        StockDateInterval::DAYS => 15,
+        StockDateInterval::HOURS => 12,
+        StockDateInterval::MINUTES => 30
+    ];
+    public const LONG_INTERVAL = [
+        StockDateInterval::DAYS => 30,
+        StockDateInterval::HOURS => 24,
+        StockDateInterval::MINUTES => 60
+    ];
 
     /**
      * @param Currency          $a_currency

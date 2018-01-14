@@ -4,7 +4,10 @@ namespace Obokaman\StockForecast\Domain\Model\Financial;
 
 final class StockDateInterval
 {
-    private const VALID_INTERVALS = ['minutes', 'hours', 'days'];
+    public const DAYS = 'days';
+    public const HOURS = 'hours';
+    public const MINUTES = 'minutes';
+    private const VALID_INTERVALS = [self::DAYS, self::HOURS, self::MINUTES];
 
     private $interval;
 
@@ -13,6 +16,14 @@ final class StockDateInterval
         $this->validateDateInterval($date_interval);
 
         $this->interval = $date_interval;
+    }
+
+    private function validateDateInterval(string $date_interval): void
+    {
+        if (!\in_array($date_interval, self::VALID_INTERVALS, true))
+        {
+            throw new \InvalidArgumentException('Invalid date interval: ' . $date_interval . '. Valid intervals include: ' . implode(', ', self::VALID_INTERVALS));
+        }
     }
 
     public static function fromStringDateInterval(string $date_interval): StockDateInterval
@@ -38,13 +49,5 @@ final class StockDateInterval
     public function interval(): string
     {
         return $this->interval;
-    }
-
-    private function validateDateInterval(string $date_interval): void
-    {
-        if (!\in_array($date_interval, self::VALID_INTERVALS, true))
-        {
-            throw new \InvalidArgumentException('Invalid date interval: ' . $date_interval . '. Valid intervals include: ' . implode(', ', self::VALID_INTERVALS));
-        }
     }
 }

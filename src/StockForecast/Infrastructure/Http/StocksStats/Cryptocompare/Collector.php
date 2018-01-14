@@ -16,7 +16,7 @@ class Collector implements CollectorContract
     public function getStats(Currency $a_currency, Stock $a_stock, StockDateInterval $a_date_interval): array
     {
         $api_method  = $this->getApiMethodForInterval($a_date_interval);
-        $api_url     = sprintf(self::API_URL, $api_method, $a_stock, $a_currency, CollectorContract::LONG_INTERVAL - 1);
+        $api_url     = sprintf(self::API_URL, $api_method, $a_stock, $a_currency, CollectorContract::LONG_INTERVAL[$a_date_interval->interval()] - 1);
         $response    = $this->collectStockInformationFromRemoteApi($api_url);
         $stats_array = [];
 
