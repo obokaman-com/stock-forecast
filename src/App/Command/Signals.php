@@ -76,18 +76,19 @@ final class Signals extends Command
     {
         $this->outputCommandTitle($currency, $stock);
 
-        $this->outputSignalsBasedOn('month', StockDateInterval::DAYS, $currency, $stock);
-        $this->outputSignalsBasedOn('day', StockDateInterval::HOURS, $currency, $stock);
         $this->outputSignalsBasedOn('hour', StockDateInterval::MINUTES, $currency, $stock);
+        $this->outputSignalsBasedOn('day', StockDateInterval::HOURS, $currency, $stock);
+        $this->outputSignalsBasedOn('month', StockDateInterval::DAYS, $currency, $stock);
     }
 
     private function outputCommandTitle(string $currency, string $stock): void
     {
         $this->output->writeln(
             sprintf(
-                '<options=bold>===== SOME INSIGHTS AND RECOMMENDATIONS FOR <info>%s - %s</info> =====</>',
+                '<options=bold>===== SOME SIGNALS FOR <info>%s - %s</info> ON %s =====</>',
                 $currency,
-                $stock
+                $stock,
+                date('M dS, H:i\h')
             )
         );
         $this->output->writeln('');

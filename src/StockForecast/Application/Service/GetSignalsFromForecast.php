@@ -40,12 +40,12 @@ final class GetSignalsFromForecast
 
         if ($this->isExponentialUp())
         {
-            $this->addSignal(Signal::GOOD('Improve exponentially.'));
+            $this->addSignal(Signal::GOOD('Improving exponentially.'));
         }
 
         if ($this->isExponentialDown())
         {
-            $this->addSignal(Signal::BAD('Deteriorate exponentially.'));
+            $this->addSignal(Signal::BAD('Deteriorating exponentially.'));
         }
 
         if ($this->isAllPositive())
@@ -70,12 +70,12 @@ final class GetSignalsFromForecast
 
         if ($this->isNoticeableRecentImprovement())
         {
-            $this->addSignal(Signal::GOOD('Has a noticeable improvement recently (' . $this->change_on_short . '%).'));
+            $this->addSignal(Signal::GOOD('Having a noticeable improvement recently (' . $this->change_on_short . '%).'));
         }
 
         if ($this->isNoticeableRecentDecrease())
         {
-            $this->addSignal(Signal::BAD('Has a noticeable decrease recently (' . $this->change_on_short . '%).'));
+            $this->addSignal(Signal::BAD('Having a noticeable decrease recently (' . $this->change_on_short . '%).'));
         }
 
         return $this->getAllSignals();
@@ -161,6 +161,6 @@ final class GetSignalsFromForecast
     /** @return Signal[] */
     private function getAllSignals(): array
     {
-        return $this->signals ?: [Signal::NEUTRAL('No relevant signals')];
+        return $this->signals ?: [Signal::NEUTRAL('No relevant signals.')];
     }
 }

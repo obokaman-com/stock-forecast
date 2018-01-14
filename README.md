@@ -29,17 +29,18 @@ $ cd stock-forecast
 $ composer install
 ```
 
-## Example
-
-You can try it with `bin/console forecast:stock <base_currency> <stock/crypto code> <date_interval_magnitude (minutes/hours/days)>`
+## Examples
 
 #### Forecast  
+
+You can try it with `bin/console forecast:stock <base_currency> <stock/crypto code> <date_interval_magnitude (minutes/hours/days)>`
 
 ```bash
 $ bin/console forecast:stock USD BTC days
 ``` 
 
-This will generate a table with the historical price information and a prevision for the next day based in the last 30 days of historical data, giving you three estimations, based on short-term (5 days), medium-term (15 days) and long-term (30 days).
+This will generate a table with the historical price information and a prevision for the next period based in the historical data, giving you three estimations, 
+based on short-term, medium-term and long-term.
 
 **Output:**
 
@@ -66,6 +67,34 @@ Forecast for next days:
 | Long term     | 16459.79 | 16886.1  | 426.31  | 2.59%      | 17608.83 | 15276.44 | 2332.38    | 2923450650.25 |
 +---------------+----------+----------+---------+------------+----------+----------+------------+---------------+
 
+```
+
+#### Insights & signals  
+
+You can try it with `bin/console forecast:signal <base_currency> <stock/crypto code> -t (optional for including forecast table)`
+
+```bash
+$ bin/console forecast:signals EUR ETC
+``` 
+
+This will output some signals and score built based on last month / day / hour for given currency / crypto pair, or the default pairs if
+none are given. 
+
+**Output:**
+
+```
+===== SOME SIGNALS FOR EUR - ETC ON Jan 14th, 15:21h =====
+
+Signals based on last hour (Score: 0):
+ - Stable in this period.
+
+Signals based on last day (Score: -1):
+ - Loosing value in short term.
+
+Signals based on last month (Score: 3):
+ - Improving exponentially.
+ - Recovering value in short term.
+ - Having a noticeable improvement recently (6.62%).
 ```
 
 There is a `forecast:test` command too that allow you to test different predicition strategies with sample sequences.
