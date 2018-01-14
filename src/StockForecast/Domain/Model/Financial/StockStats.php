@@ -52,57 +52,57 @@ final class StockStats
         return $this->timestamp;
     }
 
-    public function close()
+    public function close(): float
     {
         return $this->sensitiveRound($this->close);
     }
 
-    public function high()
+    public function high(): float
     {
         return $this->sensitiveRound($this->high);
     }
 
-    public function low()
+    public function low(): float
     {
         return $this->sensitiveRound($this->low);
     }
 
-    public function volatility()
+    public function volatility(): float
     {
         return $this->sensitiveRound($this->high - $this->low);
     }
 
-    public function open()
+    public function open(): float
     {
         return $this->sensitiveRound($this->open);
     }
 
-    public function change()
+    public function change(): float
     {
         return $this->sensitiveRound($this->close - $this->open);
     }
 
-    public function changePercent(): string
+    public function changePercent(): float
     {
-        return $this->sensitiveRound((($this->close / $this->open) - 1) * 100) . '%';
+        return $this->sensitiveRound((($this->close / $this->open) - 1) * 100);
     }
 
-    public function volumeFrom()
+    public function volumeFrom(): float
     {
         return $this->sensitiveRound($this->volume_from);
     }
 
-    public function volumeTo()
+    public function volumeTo(): float
     {
         return $this->sensitiveRound($this->volume_to);
     }
 
-    public function volume()
+    public function volume(): float
     {
         return $this->sensitiveRound($this->volume_to - $this->volume_from);
     }
 
-    private function sensitiveRound(float $amount)
+    private function sensitiveRound(float $amount): float
     {
         if (0.001 > abs($amount))
         {
