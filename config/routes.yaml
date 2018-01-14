@@ -2,9 +2,9 @@ index:
     path: /
     defaults: { _controller: 'App\Controller\Home::index' }
 
-webhook:
-    path: /webhook
-    defaults: { _controller: 'App\Controller\Webhook::bot' }
+telegram_webhook:
+    path: /webhook/telegram/{token}/
+    defaults: { _controller: 'App\Controller\Webhook::telegram' }
 
 # first, run composer req annotations
 #controllers:
