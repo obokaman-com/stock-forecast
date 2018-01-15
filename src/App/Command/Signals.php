@@ -23,8 +23,6 @@ final class Signals extends Command
         ['EUR', 'ETH'],
         ['EUR', 'XRP'],
         ['EUR', 'LTC'],
-        ['EUR', 'ETC'],
-        ['EUR', 'DASH'],
         ['EUR', 'BCH']
     ];
     private $stock_predict_service;

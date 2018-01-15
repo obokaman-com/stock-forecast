@@ -63,7 +63,7 @@ final class PredictStockValue
         $all_targets = [];
         foreach ($this->sample_data as $stats)
         {
-            $all_targets['change'][]      = $stats->change();
+            $all_targets['close'][]       = $stats->close();
             $all_targets['high'][]        = $stats->high();
             $all_targets['low'][]         = $stats->low();
             $all_targets['volume_from'][] = $stats->volumeFrom();
@@ -89,7 +89,7 @@ final class PredictStockValue
     {
         $last_measurement = end($this->sample_data);
 
-        $change_prediction      = $this->predictSelectedTarget($targets['change'], 1);
+        $close_prediction       = $this->predictSelectedTarget($targets['close'], 1);
         $high_prediction        = $this->predictSelectedTarget($targets['high'], 1);
         $low_prediction         = $this->predictSelectedTarget($targets['low'], 1);
         $volume_from_prediction = $this->predictSelectedTarget($targets['volume_from'], 1);
@@ -100,7 +100,7 @@ final class PredictStockValue
             $this->request->stock(),
             $last_measurement->timestamp()->add(\DateInterval::createFromDateString('1 ' . $this->request->dateInterval()->interval())),
             $last_measurement->close(),
-            $last_measurement->close() + $change_prediction[0],
+            $close_prediction[0],
             $high_prediction[0],
             $low_prediction[0],
             $volume_from_prediction[0],
