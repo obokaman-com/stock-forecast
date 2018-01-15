@@ -64,21 +64,35 @@ class Webhook extends Controller
                         'Markdown'
                     );
 
-                    $signals_message = $webhook->outputSignalsBasedOn('hour', StockDateInterval::MINUTES, $currency, $crypto);
-                    $signals_message .= $webhook->outputSignalsBasedOn('day', StockDateInterval::HOURS, $currency, $crypto);
-                    $signals_message .= $webhook->outputSignalsBasedOn('month', StockDateInterval::DAYS, $currency, $crypto);
+                    try
+                    {
+                        $signals_message = $webhook->outputSignalsBasedOn('hour', StockDateInterval::MINUTES, $currency, $crypto);
+                        $signals_message .= $webhook->outputSignalsBasedOn('day', StockDateInterval::HOURS, $currency, $crypto);
+                        $signals_message .= $webhook->outputSignalsBasedOn('month', StockDateInterval::DAYS, $currency, $crypto);
 
-                    $bot->sendMessage(
-                        $message->getChat()->getId(),
-                        $signals_message,
-                        'Markdown'
-                    );
+                        $bot->sendMessage(
+                            $message->getChat()->getId(),
+                            $signals_message,
+                            'Markdown'
+                        );
+                    }
+                    catch (TelegramException $e)
+                    {
+                        throw $e;
+                    }
+                    catch (\Exception $e)
+                    {
+                        $bot->sendMessage(
+                            $message->getChat()->getId(),
+                            'There was an error: ' . $e->getMessage()
+                        );
+                    }
                 }
             );
 
             $bot->run();
         }
-        catch (TelegramException $e)
+        catch (\Exception $e)
         {
             return new JsonResponse(
                 [
