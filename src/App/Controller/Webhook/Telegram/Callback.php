@@ -1,128 +1,24 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Webhook\Telegram;
 
-use Obokaman\StockForecast\Application\Service\GetSignalsFromForecast;
-use Obokaman\StockForecast\Application\Service\GetSignalsFromForecastRequest;
-use Obokaman\StockForecast\Application\Service\PredictStockValue;
-use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
 use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
-use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
-use TelegramBot\Api\Exception as TelegramException;
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
-use TelegramBot\Api\Types\Message as TelegramMessage;
+use TelegramBot\Api\Exception as TelegramException;
 
-class Webhook extends Controller
+final class Callback
 {
-    private $stock_predict_service;
-    private $get_signals_service;
-
-    public function __construct(PredictStockValue $a_stock_predict_service, GetSignalsFromForecast $a_get_signals_service)
-    {
-        $this->stock_predict_service = $a_stock_predict_service;
-        $this->get_signals_service   = $a_get_signals_service;
-    }
-
-    public function telegram(string $token): JsonResponse
-    {
-        if ($token !== $_SERVER['TELEGRAM_BOT_TOKEN'])
-        {
-            throw new NotFoundHttpException();
-        }
-
-        /** @var TelegramClient|BotApi $bot */
-        $bot = new TelegramClient($_SERVER['TELEGRAM_BOT_TOKEN']);
-
-        try
-        {
-            $this->assignCommands($bot);
-            $this->assignCallbacks($bot);
-
-            $bot->run();
-        }
-        catch (\Exception $e)
-        {
-            return new JsonResponse(
-                [
-                    'error'   => \get_class($e),
-                    'message' => $e->getMessage()
-                ]
-            );
-        }
-
-        return new JsonResponse([]);
-    }
-
     /**
      * @param TelegramClient|BotApi $bot
+     * @param Telegram              $webhook
      *
      * @return void
      */
-    private function assignCommands(TelegramClient $bot): void
+    public static function configure(TelegramClient $bot, Telegram $webhook): void
     {
-        $bot->command(
-            'start',
-            function (TelegramMessage $a_message) use ($bot) {
-                $welcome_message = <<<MARKDOWN
-Hey there. Welcome to Crypto Insights bot. You can use bot commands to get some insights, predictions and recommendations for your favorite cryptos.
-MARKDOWN;
-                $bot->sendMessage($a_message->getChat()->getId(), $welcome_message, 'Markdown');
-            }
-        );
-
-        $bot->command(
-            'help',
-            function (TelegramMessage $a_message) use ($bot) {
-                $help_message = <<<MARKDOWN
-I can give you some forecast, analysis and insights using historical data and sentiment analysis from several sources.
-
-*Insights*
-
-/insights - Will ask you for a currency / crypto pair to give some insights based on last changes in the valuation.
-MARKDOWN;
-                $bot->sendMessage($a_message->getChat()->getId(), $help_message, 'Markdown');
-            }
-        );
-
-        $webhook = $this;
-        $bot->command(
-            'insights',
-            function (TelegramMessage $message) use ($bot, $webhook) {
-                $chat_id = $message->getChat()->getId();
-
-                $bot->sendMessage(
-                    $chat_id,
-                    'Ok, select base currency.',
-                    null,
-                    false,
-                    null,
-                    new InlineKeyboardMarkup(
-                        [
-                            [
-                                ['text' => 'USD', 'callback_data' => json_encode(['method' => 'insights_ask_stock', 'currency' => 'USD'])],
-                                ['text' => 'EUR', 'callback_data' => json_encode(['method' => 'insights_ask_stock', 'currency' => 'EUR'])]
-                            ]
-                        ]
-                    )
-                );
-            }
-        );
-    }
-
-    /**
-     * @param TelegramClient|BotApi $bot
-     *
-     * @return void
-     */
-    private function assignCallbacks(TelegramClient $bot): void
-    {
-        $webhook = $this;
         $bot->callbackQuery(
             function (CallbackQuery $callback_query) use ($bot, $webhook) {
                 $callback_data = @json_decode($callback_query->getData(), true) ?: ['method' => 'empty'];
@@ -191,7 +87,19 @@ MARKDOWN;
                             $bot->sendMessage(
                                 $callback_query->getMessage()->getChat()->getId(),
                                 $signals_message,
-                                'Markdown'
+                                'Markdown',
+                                false,
+                                null,
+                                new InlineKeyboardMarkup(
+                                    [
+                                        [
+                                            [
+                                                'text' => 'View ' . $currency . '-' . $crypto . ' chart online',
+                                                'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($crypto) . '/charts/' . strtolower($currency)
+                                            ]
+                                        ]
+                                    ]
+                                )
                             );
                         }
                         catch (TelegramException $e)
@@ -210,26 +118,5 @@ MARKDOWN;
                 }
             }
         );
-    }
-
-    private function outputSignalsBasedOn(string $interval, string $interval_unit, string $currency, string $stock): string
-    {
-        $prediction_request  = new PredictStockValueRequest($currency, $stock, $interval_unit);
-        $prediction_response = $this->stock_predict_service->predict($prediction_request);
-        $signals_request     = new GetSignalsFromForecastRequest(
-            $prediction_response->shortTermStats(),
-            $prediction_response->mediumTermStats(),
-            $prediction_response->longTermStats()
-        );
-        $signals_response    = $this->get_signals_service->getSignals($signals_request);
-
-        $message = 'Based on *last ' . $interval . '* (Score: ' . CalculateScore::calculate(...$signals_response) . '):' . PHP_EOL;
-
-        foreach ($signals_response as $signal)
-        {
-            $message .= '_ - ' . $signal . '_' . PHP_EOL;
-        }
-
-        return $message . PHP_EOL;
     }
 }
