@@ -6,6 +6,7 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message as TelegramMessage;
+use TelegramBot\Api\Types\Update;
 
 final class Command
 {
@@ -13,9 +14,36 @@ final class Command
      * @param TelegramClient|BotApi $bot
      *
      * @return void
+     * @throws \TelegramBot\Api\Exception
      */
     public static function configure(TelegramClient $bot): void
     {
+        $bot->on(
+            function (Update $an_update) use ($bot) {
+                $a_message      = $an_update->getMessage();
+                $answer_message = <<<MARKDOWN
+Sorry, currently I only understand a few commands.
+
+Please, use /help to know available commands.
+MARKDOWN;
+
+                $bot->sendMessage($a_message->getChat()->getId(), $answer_message, 'Markdown');
+            },
+            function (Update $an_update) {
+                $received_message = $an_update->getMessage();
+                
+                $is_not_a_message = (null === $received_message || !$received_message instanceof TelegramMessage);
+                if ($is_not_a_message)
+                {
+                    return false;
+                }
+
+                $does_it_seems_a_command = preg_match('/^\//', $an_update->getMessage()->getText());
+
+                return !$does_it_seems_a_command;
+            }
+        );
+
         $bot->command(
             'start',
             function (TelegramMessage $a_message) use ($bot) {
