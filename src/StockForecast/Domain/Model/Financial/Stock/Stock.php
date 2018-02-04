@@ -1,6 +1,6 @@
 <?php
 
-namespace Obokaman\StockForecast\Domain\Model\Financial;
+namespace Obokaman\StockForecast\Domain\Model\Financial\Stock;
 
 final class Stock
 {

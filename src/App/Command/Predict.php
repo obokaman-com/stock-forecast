@@ -4,8 +4,10 @@ namespace App\Command;
 
 use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
-use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
-use Obokaman\StockForecast\Infrastructure\Http\StocksStats\Collector;
+use Obokaman\StockForecast\Domain\Model\Date\Interval;
+use Obokaman\StockForecast\Domain\Model\Date\Period;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\MeasurementCollection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -48,14 +50,17 @@ final class Predict extends Command
         $prediction_response = $this->stock_predict_service->predict($prediction_request);
 
         $output->writeln('<options=bold>Last real measurements:</>');
-        $this->outputStatsTable($output, $prediction_response->realStatsArray());
+        $this->outputStatsTable($output, $prediction_response->realMeasurements());
+
+        $output->writeln('<options=bold>Changes in last days ' . $input->getArgument('date_interval') . ':</>');
+        $this->outputChangeTable($output, $prediction_response->realMeasurements());
 
         $output->writeln('<options=bold>Forecast for next ' . $input->getArgument('date_interval') . ':</>');
         $this->outputForecastTable(
             $output,
-            $prediction_response->shortTermStats(),
-            $prediction_response->mediumTermStats(),
-            $prediction_response->longTermStats()
+            $prediction_response->shortTermPredictions(),
+            $prediction_response->mediumTermPredicitons(),
+            $prediction_response->longTermPredictions()
         );
     }
 
@@ -66,19 +71,18 @@ final class Predict extends Command
                 '<options=bold>===== BUILDING FORECAST FOR <info>%s - %s</info> USING DATA FROM LAST %d %s =====</>',
                 $input->getArgument('stock'),
                 $input->getArgument('currency'),
-                Collector::LONG_INTERVAL[$input->getArgument('date_interval')],
+                Period::getLong(Interval::fromStringDateInterval($input->getArgument('date_interval'))),
                 $input->getArgument('date_interval')
             )
         );
         $output->writeln('');
     }
 
-    private function outputStatsTable(OutputInterface $output, array $measurements): void
+    private function outputStatsTable(OutputInterface $output, MeasurementCollection $measurements): void
     {
         $table = new Table($output);
         $table->setHeaders(['Date', 'Open', 'Close', 'Change', 'Change (%)', 'High', 'Low', 'Volatility', 'Volume']);
 
-        /** @var StockStats $stock_stats */
         foreach ($measurements as $stock_stats)
         {
             $table->addRow(
@@ -99,20 +103,22 @@ final class Predict extends Command
         $output->writeln('');
     }
 
-    private function outputForecastTable(OutputInterface $output, StockStats ...$stock_stats)
+    private function outputForecastTable(OutputInterface $output, MeasurementCollection ...$stock_predictions)
     {
         $table = new Table($output);
         $table->setHeaders(['Date interval', 'Open', 'Close', 'Change', 'Change (%)', 'High', 'Low', 'Volatility', 'Volume']);
 
-        $this->addTableRow($table, 'Short term', $stock_stats[0]);
-        $this->addTableRow($table, 'Medium term', $stock_stats[1]);
-        $this->addTableRow($table, 'Long term', $stock_stats[2]);
+        [$short_term_predictions, $mid_term_predictions, $long_term_predictions] = $stock_predictions;
+
+        $this->addStocksTableRow($table, 'Short term', $short_term_predictions->current());
+        $this->addStocksTableRow($table, 'Medium term', $mid_term_predictions->current());
+        $this->addStocksTableRow($table, 'Long term', $long_term_predictions->current());
 
         $table->render();
         $output->writeln('');
     }
 
-    private function addTableRow(Table $table, string $label, StockStats $stats): void
+    private function addStocksTableRow(Table $table, string $label, Measurement $stats): void
     {
         $table->addRow(
             [
@@ -127,5 +133,40 @@ final class Predict extends Command
                 $stats->volume()
             ]
         );
+    }
+
+    private function outputChangeTable(OutputInterface $output, MeasurementCollection $long_term_measurements)
+    {
+        $table = new Table($output);
+        $table->setHeaders(['Date interval', 'Aggregated Change', 'Aggregated Change (%)']);
+
+        $short_term_measurements = $long_term_measurements->filterByPeriod(Period::SHORT);
+        $table->addRow(
+            [
+                'Short term',
+                $short_term_measurements->priceChangeAmount(),
+                $short_term_measurements->priceChangePercent() . '%'
+            ]
+        );
+
+        $mid_term_measurements = $long_term_measurements->filterByPeriod(Period::MEDIUM);
+        $table->addRow(
+            [
+                'Medium term',
+                $mid_term_measurements->priceChangeAmount(),
+                $mid_term_measurements->priceChangePercent() . '%'
+            ]
+        );
+
+        $table->addRow(
+            [
+                'Long term',
+                $long_term_measurements->priceChangeAmount(),
+                $long_term_measurements->priceChangePercent() . '%'
+            ]
+        );
+
+        $table->render();
+        $output->writeln('');
     }
 }

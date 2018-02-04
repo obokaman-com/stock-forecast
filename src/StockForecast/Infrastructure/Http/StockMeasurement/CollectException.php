@@ -1,6 +1,6 @@
 <?php
 
-namespace Obokaman\StockForecast\Infrastructure\Http\StocksStats;
+namespace Obokaman\StockForecast\Infrastructure\Http\StockMeasurement;
 
 final class CollectException extends \RuntimeException
 {

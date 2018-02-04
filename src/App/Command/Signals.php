@@ -6,8 +6,8 @@ use Obokaman\StockForecast\Application\Service\GetSignalsFromForecast;
 use Obokaman\StockForecast\Application\Service\GetSignalsFromForecastRequest;
 use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
-use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
-use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
+use Obokaman\StockForecast\Domain\Model\Date\Interval;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement;
 use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -74,9 +74,9 @@ final class Signals extends Command
     {
         $this->outputCommandTitle($currency, $stock);
 
-        $this->outputSignalsBasedOn('hour', StockDateInterval::MINUTES, $currency, $stock);
-        $this->outputSignalsBasedOn('day', StockDateInterval::HOURS, $currency, $stock);
-        $this->outputSignalsBasedOn('month', StockDateInterval::DAYS, $currency, $stock);
+        $this->outputSignalsBasedOn('hour', Interval::MINUTES, $currency, $stock);
+        $this->outputSignalsBasedOn('day', Interval::HOURS, $currency, $stock);
+        $this->outputSignalsBasedOn('month', Interval::DAYS, $currency, $stock);
     }
 
     private function outputCommandTitle(string $currency, string $stock): void
@@ -93,7 +93,7 @@ final class Signals extends Command
     }
 
 
-    private function outputForecastTable(StockStats ...$stock_stats)
+    private function outputForecastTable(Measurement ...$stock_stats)
     {
         $table = new Table($this->output);
         $table->setHeaders(['Date interval', 'Open', 'Close', 'Change', 'Change (%)', 'High', 'Low', 'Volatility', 'Volume']);
@@ -105,7 +105,7 @@ final class Signals extends Command
         $table->render();
     }
 
-    private function addTableRow(Table $table, string $label, StockStats $stats): void
+    private function addTableRow(Table $table, string $label, Measurement $stats): void
     {
         $table->addRow(
             [
@@ -126,21 +126,23 @@ final class Signals extends Command
     {
         $prediction_request  = new PredictStockValueRequest($currency, $stock, $interval_unit);
         $prediction_response = $this->stock_predict_service->predict($prediction_request);
-        $signals_request     = new GetSignalsFromForecastRequest(
-            $prediction_response->shortTermStats(),
-            $prediction_response->mediumTermStats(),
-            $prediction_response->longTermStats()
+
+        $signals_request  = new GetSignalsFromForecastRequest(
+            $prediction_response->realMeasurements(),
+            $prediction_response->shortTermPredictions(),
+            $prediction_response->mediumTermPredicitons(),
+            $prediction_response->longTermPredictions()
         );
-        $signals_response    = $this->get_signals_service->getSignals($signals_request);
+        $signals_response = $this->get_signals_service->getSignals($signals_request);
 
         $this->output->writeln('<options=bold>Signals based on last ' . $interval . ' (Score: ' . CalculateScore::calculate(...$signals_response) . '):</>');
 
         if ($this->input->getOption('table_output'))
         {
             $this->outputForecastTable(
-                $prediction_response->shortTermStats(),
-                $prediction_response->mediumTermStats(),
-                $prediction_response->longTermStats()
+                $prediction_response->shortTermPredictions(),
+                $prediction_response->mediumTermPredicitons(),
+                $prediction_response->longTermPredictions()
             );
         }
 

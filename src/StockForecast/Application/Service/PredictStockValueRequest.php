@@ -2,9 +2,9 @@
 
 namespace Obokaman\StockForecast\Application\Service;
 
+use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
-use Obokaman\StockForecast\Domain\Model\Financial\Stock;
-use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
 
 final class PredictStockValueRequest
 {
@@ -29,8 +29,8 @@ final class PredictStockValueRequest
         return Stock::fromCode($this->stock_code);
     }
 
-    public function dateInterval(): StockDateInterval
+    public function dateInterval(): Interval
     {
-        return StockDateInterval::fromStringDateInterval($this->date_interval);
+        return Interval::fromStringDateInterval($this->date_interval);
     }
 }

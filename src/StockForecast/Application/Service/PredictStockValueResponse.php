@@ -2,43 +2,45 @@
 
 namespace Obokaman\StockForecast\Application\Service;
 
-use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\MeasurementCollection;
 
 final class PredictStockValueResponse
 {
-    private $real_stats_array;
-    private $short_term_stats;
-    private $medium_term_stats;
-    private $long_term_stats;
+    private $real_measurements;
+    private $short_term_predictions;
+    private $medium_term_predictions;
+    private $long_term_predictions;
 
-    public function __construct(array $a_real_stats, StockStats $a_short_term_stats, StockStats $a_medium_term_stats, StockStats $a_long_term_stats)
+    public function __construct(
+        MeasurementCollection $a_real_stats,
+        MeasurementCollection $a_short_term_predictions,
+        MeasurementCollection $a_medium_term_predictions,
+        MeasurementCollection $a_long_term_predictions
+    )
     {
-        $this->real_stats_array  = $a_real_stats;
-        $this->short_term_stats  = $a_short_term_stats;
-        $this->medium_term_stats = $a_medium_term_stats;
-        $this->long_term_stats   = $a_long_term_stats;
+        $this->real_measurements       = $a_real_stats;
+        $this->short_term_predictions  = $a_short_term_predictions;
+        $this->medium_term_predictions = $a_medium_term_predictions;
+        $this->long_term_predictions   = $a_long_term_predictions;
     }
 
-    /**
-     * @return StockStats[]
-     */
-    public function realStatsArray(): array
+    public function realMeasurements(): MeasurementCollection
     {
-        return $this->real_stats_array;
+        return $this->real_measurements;
     }
 
-    public function shortTermStats(): StockStats
+    public function shortTermPredictions(): MeasurementCollection
     {
-        return $this->short_term_stats;
+        return $this->short_term_predictions;
     }
 
-    public function mediumTermStats(): StockStats
+    public function mediumTermPredicitons(): MeasurementCollection
     {
-        return $this->medium_term_stats;
+        return $this->medium_term_predictions;
     }
 
-    public function longTermStats(): StockStats
+    public function longTermPredictions(): MeasurementCollection
     {
-        return $this->long_term_stats;
+        return $this->long_term_predictions;
     }
 }

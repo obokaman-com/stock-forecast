@@ -2,21 +2,36 @@
 
 namespace Obokaman\StockForecast\Application\Service;
 
+use Obokaman\StockForecast\Domain\Model\Date\Period;
 use Obokaman\StockForecast\Domain\Model\Financial\Signal;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\MeasurementCollection;
 
 final class GetSignalsFromForecast
 {
     private const SENSIBILITY_THRESHOLD = 0.75;
     private const NOTICEABLE_CHANGES = 5;
+    private const VOLATILITY_THRESHOLD = 75;
 
     /** @var Signal[] */
     private $signals;
+
+    /** @var MeasurementCollection */
+    private $long_term_measurements;
+    /** @var MeasurementCollection */
+    private $mid_term_measurements;
+    /** @var MeasurementCollection */
+    private $short_term_measurements;
+
     private $change_on_long;
     private $change_on_medium;
     private $change_on_short;
     private $max_change;
     private $min_change;
     private $diff_change;
+
+    private $regression_on_short;
+    private $regression_on_medium;
+    private $regression_on_long;
 
     /**
      * @param GetSignalsFromForecastRequest $a_get_signals_request
@@ -25,37 +40,74 @@ final class GetSignalsFromForecast
      */
     public function getSignals(GetSignalsFromForecastRequest $a_get_signals_request): array
     {
+        $this->long_term_measurements  = $a_get_signals_request->measurements();
+        $this->mid_term_measurements   = $a_get_signals_request->measurements()->filterByPeriod(Period::MEDIUM);
+        $this->short_term_measurements = $a_get_signals_request->measurements()->filterByPeriod(Period::SHORT);
+
         $this->signals = [];
 
-        $this->change_on_long   = $a_get_signals_request->longTermStats()->changePercent();
-        $this->change_on_medium = $a_get_signals_request->mediumTermStats()->changePercent();
-        $this->change_on_short  = $a_get_signals_request->shortTermStats()->changePercent();
+        $this->change_on_long   = $this->long_term_measurements->priceChangePercent();
+        $this->change_on_medium = $this->mid_term_measurements->priceChangePercent();
+        $this->change_on_short  = $this->short_term_measurements->priceChangePercent();
+
+        $this->regression_on_short  = $a_get_signals_request
+            ->shortTermPredictions()
+            ->filterByQuantity(2)
+            ->priceChangePercent();
+        $this->regression_on_medium = $a_get_signals_request
+            ->mediumTermPredictions()
+            ->filterByQuantity(2)
+            ->priceChangePercent();
+        $this->regression_on_long   = $a_get_signals_request
+            ->longTermPredictions()
+            ->filterByQuantity(2)
+            ->priceChangePercent();
 
         $this->setMaxMinAndDiff();
+
+        if ($this->long_term_measurements->priceChangePercent() > self::SENSIBILITY_THRESHOLD)
+        {
+            $this->addSignal(Signal::GOOD('Earning ' . $this->long_term_measurements->priceChangePercent() . '% in this period.'));
+        }
+
+        if ($this->long_term_measurements->priceChangePercent() < -self::SENSIBILITY_THRESHOLD)
+        {
+            $this->addSignal(Signal::BAD('Loosing ' . $this->long_term_measurements->priceChangePercent() . '% in this period.'));
+        }
+
+        if ($this->isPositiveRegression())
+        {
+            $this->addSignal(Signal::GOOD('Positive tendency in this period (' . $this->regression_on_long . '%).'));
+        }
+
+        if ($this->isNegativeRegression())
+        {
+            $this->addSignal(Signal::BAD('Negative tendency in this period (' . $this->regression_on_long . '%).'));
+        }
 
         if ($this->isStable())
         {
             $this->addSignal(Signal::NEUTRAL('Stable in this period.'));
         }
 
-        if ($this->isExponentialUp())
+        if ($this->isRegressionExponentialUp())
         {
             $this->addSignal(Signal::GOOD('Improving exponentially.'));
         }
 
-        if ($this->isExponentialDown())
+        if ($this->isRegressionExponentialDown())
         {
             $this->addSignal(Signal::BAD('Deteriorating exponentially.'));
         }
 
         if ($this->isAllPositive())
         {
-            $this->addSignal(Signal::EXCELLENT('Earning in all scenarios.'));
+            $this->addSignal(Signal::EXCELLENT('Earning in all date ranges.'));
         }
 
         if ($this->isAllNegative())
         {
-            $this->addSignal(Signal::POOR('Loosing in all scenarios.'));
+            $this->addSignal(Signal::POOR('Loosing in all date ranges.'));
         }
 
         if ($this->isRecovering())
@@ -78,6 +130,11 @@ final class GetSignalsFromForecast
             $this->addSignal(Signal::BAD('Having a noticeable decrease recently (' . $this->change_on_short . '%).'));
         }
 
+        if ($this->isHighlyVolatile())
+        {
+            $this->addSignal(Signal::NEUTRAL('High volatility during this period: Max increase: ' . $this->max_change . '%, Max. decrease: ' . $this->min_change . '%.'));
+        }
+
         return $this->getAllSignals();
     }
 
@@ -86,14 +143,14 @@ final class GetSignalsFromForecast
         return $this->diff_change < self::SENSIBILITY_THRESHOLD;
     }
 
-    private function isExponentialUp(): bool
+    private function isRegressionExponentialUp(): bool
     {
-        return $this->change_on_medium > $this->change_on_long && $this->change_on_short > $this->change_on_medium && $this->diff_change > self::SENSIBILITY_THRESHOLD;
+        return $this->regression_on_medium > $this->regression_on_long && $this->regression_on_short > $this->regression_on_medium && $this->diff_change > self::SENSIBILITY_THRESHOLD;
     }
 
-    private function isExponentialDown(): bool
+    private function isRegressionExponentialDown(): bool
     {
-        return $this->change_on_medium < $this->change_on_long && $this->change_on_short < $this->change_on_medium && $this->diff_change > self::SENSIBILITY_THRESHOLD;
+        return $this->regression_on_medium < $this->regression_on_long && $this->regression_on_short < $this->regression_on_medium && $this->diff_change > self::SENSIBILITY_THRESHOLD;
     }
 
     private function isAllPositive(): bool
@@ -109,13 +166,13 @@ final class GetSignalsFromForecast
     private function isRecovering(): bool
     {
         return ($this->change_on_short > self::SENSIBILITY_THRESHOLD
-            && ($this->change_on_medium < 0 || $this->change_on_long < 0));
+            && ($this->change_on_medium < 0 && $this->change_on_long < 0));
     }
 
     private function isLoosing(): bool
     {
         return ($this->change_on_short < -self::SENSIBILITY_THRESHOLD
-            && ($this->change_on_medium > 0 || $this->change_on_long > 0));
+            && ($this->change_on_medium > 0 && $this->change_on_long > 0));
     }
 
     private function isNoticeableRecentImprovement(): bool
@@ -128,6 +185,11 @@ final class GetSignalsFromForecast
         return $this->change_on_short <= -self::NOTICEABLE_CHANGES;
     }
 
+    private function isHighlyVolatile(): bool
+    {
+        return $this->diff_change >= self::VOLATILITY_THRESHOLD;
+    }
+
     private function addSignal(Signal $signal): void
     {
         $this->signals[] = $signal;
@@ -135,24 +197,21 @@ final class GetSignalsFromForecast
 
     private function setMaxMinAndDiff(): void
     {
-        $this->max_change = $this->change_on_long;
-        if ($this->change_on_medium > $this->max_change)
-        {
-            $this->max_change = $this->change_on_medium;
-        }
-        if ($this->change_on_short > $this->max_change)
-        {
-            $this->max_change = $this->change_on_short;
-        }
+        $this->max_change = 0;
+        $this->min_change = 0;
 
-        $this->min_change = $this->change_on_long;
-        if ($this->change_on_medium < $this->min_change)
+        /** @var \Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement $stock_stats */
+        foreach ($this->long_term_measurements as $stock_stats)
         {
-            $this->min_change = $this->change_on_medium;
-        }
-        if ($this->change_on_short < $this->min_change)
-        {
-            $this->min_change = $this->change_on_short;
+            $change_percent = $stock_stats->changePercent();
+            if ($change_percent > $this->max_change)
+            {
+                $this->max_change = $change_percent;
+            }
+            if ($change_percent < $this->min_change)
+            {
+                $this->min_change = $change_percent;
+            }
         }
 
         $this->diff_change = $this->max_change - $this->min_change;
@@ -162,5 +221,15 @@ final class GetSignalsFromForecast
     private function getAllSignals(): array
     {
         return $this->signals ?: [Signal::NEUTRAL('No relevant signals.')];
+    }
+
+    private function isPositiveRegression(): bool
+    {
+        return $this->regression_on_long > self::SENSIBILITY_THRESHOLD;
+    }
+
+    private function isNegativeRegression(): bool
+    {
+        return $this->regression_on_long < -self::SENSIBILITY_THRESHOLD;
     }
 }

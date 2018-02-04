@@ -1,8 +1,8 @@
 <?php
 
-namespace Obokaman\StockForecast\Domain\Model\Financial;
+namespace Obokaman\StockForecast\Domain\Model\Date;
 
-final class StockDateInterval
+final class Interval
 {
     public const DAYS = 'days';
     public const HOURS = 'hours';
@@ -11,7 +11,7 @@ final class StockDateInterval
 
     private $interval;
 
-    public function __construct(string $date_interval)
+    private function __construct(string $date_interval)
     {
         $this->validateDateInterval($date_interval);
 
@@ -26,9 +26,25 @@ final class StockDateInterval
         }
     }
 
-    public static function fromStringDateInterval(string $date_interval): StockDateInterval
+    public static function fromStringDateInterval(string $date_interval): Interval
     {
         return new self($date_interval);
+    }
+
+    public static function fromDateInterval(\DateInterval $a_date_interval): Interval
+    {
+        if (0 < $a_date_interval->d)
+        {
+            return new self(self::DAYS);
+        }
+        if (0 < $a_date_interval->h)
+        {
+            return new self(self::HOURS);
+        }
+        if (0 < $a_date_interval->i)
+        {
+            return new self(self::MINUTES);
+        }
     }
 
     public function isDays(): bool

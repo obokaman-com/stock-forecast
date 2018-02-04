@@ -1,11 +1,12 @@
 <?php
 
-namespace Obokaman\StockForecast\Infrastructure\Http\StocksStats\Cryptocompare;
+namespace Obokaman\StockForecast\Infrastructure\Http\StocksMeasurement\Cryptocompare;
 
+use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
-use Obokaman\StockForecast\Domain\Model\Financial\Stock;
-use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
-use Obokaman\StockForecast\Domain\Model\Financial\StockStats;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
+use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Cryptocompare\Collector;
 use PHPUnit\Framework\TestCase;
 
 class CollectorTest extends TestCase
@@ -23,16 +24,16 @@ class CollectorTest extends TestCase
     private function whenICollectStockStats()
     {
         $this->collector         = new CollectorTestClass();
-        $this->stock_stats_array = $this->collector->getStats(
+        $this->stock_stats_array = $this->collector->getMeasurements(
             Currency::fromCode('USD'),
             Stock::fromCode('BTC'),
-            StockDateInterval::fromStringDateInterval('days')
+            Interval::fromStringDateInterval('days')
         );
     }
 
     private function thenIShouldHaveAStockStatsArray()
     {
-        $this->assertContainsOnlyInstancesOf(StockStats::class, $this->stock_stats_array);
+        $this->assertContainsOnlyInstancesOf(Measurement::class, $this->stock_stats_array);
     }
 }
 

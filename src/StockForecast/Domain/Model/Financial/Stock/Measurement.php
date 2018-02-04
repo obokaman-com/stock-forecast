@@ -1,8 +1,10 @@
 <?php
 
-namespace Obokaman\StockForecast\Domain\Model\Financial;
+namespace Obokaman\StockForecast\Domain\Model\Financial\Stock;
 
-final class StockStats
+use Obokaman\StockForecast\Domain\Model\Financial\Currency;
+
+final class Measurement
 {
     private $currency;
     private $stock;
