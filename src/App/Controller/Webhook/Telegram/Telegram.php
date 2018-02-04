@@ -59,9 +59,10 @@ class Telegram
         $prediction_response = $this->stock_predict_service->predict($prediction_request);
 
         $signals_request  = new GetSignalsFromForecastRequest(
-            $prediction_response->shortTermStats(),
-            $prediction_response->mediumTermStats(),
-            $prediction_response->longTermStats()
+            $prediction_response->realMeasurements(),
+            $prediction_response->shortTermPredictions(),
+            $prediction_response->mediumTermPredicitons(),
+            $prediction_response->longTermPredictions()
         );
         $signals_response = $this->get_signals_service->getSignals($signals_request);
 

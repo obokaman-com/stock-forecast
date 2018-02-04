@@ -2,7 +2,7 @@
 
 namespace App\Controller\Webhook\Telegram;
 
-use Obokaman\StockForecast\Domain\Model\Financial\StockDateInterval;
+use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
 use TelegramBot\Api\Types\CallbackQuery;
@@ -80,9 +80,9 @@ final class Callback
 
                         try
                         {
-                            $signals_message = $webhook->outputSignalsBasedOn('hour', StockDateInterval::MINUTES, $currency, $crypto);
-                            $signals_message .= $webhook->outputSignalsBasedOn('day', StockDateInterval::HOURS, $currency, $crypto);
-                            $signals_message .= $webhook->outputSignalsBasedOn('month', StockDateInterval::DAYS, $currency, $crypto);
+                            $signals_message = $webhook->outputSignalsBasedOn('hour', Interval::MINUTES, $currency, $crypto);
+                            $signals_message .= $webhook->outputSignalsBasedOn('day', Interval::HOURS, $currency, $crypto);
+                            $signals_message .= $webhook->outputSignalsBasedOn('month', Interval::DAYS, $currency, $crypto);
 
                             $bot->sendMessage(
                                 $callback_query->getMessage()->getChat()->getId(),
