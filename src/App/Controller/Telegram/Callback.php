@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Controller\Webhook\Telegram;
+namespace App\Controller\Telegram;
 
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
+use TelegramBot\Api\Exception as TelegramException;
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
-use TelegramBot\Api\Exception as TelegramException;
 
 final class Callback
 {
     /**
      * @param TelegramClient|BotApi $bot
-     * @param Telegram              $webhook
+     * @param Webhook               $webhook
      *
      * @return void
      */
-    public static function configure(TelegramClient $bot, Telegram $webhook): void
+    public static function configure(TelegramClient $bot, Webhook $webhook): void
     {
         $bot->callbackQuery(
             function (CallbackQuery $callback_query) use ($bot, $webhook) {
@@ -114,6 +114,63 @@ final class Callback
                             );
                         }
 
+                        break;
+
+                    case 'subscribe_ask_stock':
+                        $bot->editMessageText(
+                            $callback_query->getMessage()->getChat()->getId(),
+                            $callback_query->getMessage()->getMessageId(),
+                            'Ok, now select the crypto:',
+                            null,
+                            false,
+                            new InlineKeyboardMarkup(
+                                [
+                                    [
+                                        [
+                                            'text'          => 'BTC',
+                                            'callback_data' => json_encode(
+                                                ['method' => 'subscribe', 'currency' => $callback_data['currency'], 'crypto' => 'BTC']
+                                            )
+                                        ],
+                                        [
+                                            'text'          => 'ETH',
+                                            'callback_data' => json_encode(
+                                                ['method' => 'subscribe', 'currency' => $callback_data['currency'], 'crypto' => 'ETH']
+                                            )
+                                        ]
+                                    ],
+                                    [
+                                        [
+                                            'text'          => 'XRP',
+                                            'callback_data' => json_encode(
+                                                ['method' => 'subscribe', 'currency' => $callback_data['currency'], 'crypto' => 'XRP']
+                                            )
+                                        ],
+                                        [
+                                            'text'          => 'LTC',
+                                            'callback_data' => json_encode(
+                                                ['method' => 'subscribe', 'currency' => $callback_data['currency'], 'crypto' => 'LTC']
+                                            )
+                                        ],
+                                    ]
+                                ]
+                            )
+                        );
+                        break;
+
+                    case 'subscribe':
+                        $callback_data = @json_decode($callback_query->getData(), true) ?: ['method' => 'empty'];
+                        $currency      = $callback_data['currency'];
+                        $crypto        = $callback_data['crypto'];
+
+                        $message = $callback_query->getMessage();
+
+                        $bot->editMessageText(
+                            $message->getChat()->getId(),
+                            $message->getMessageId(),
+                            sprintf('Ok, you\'re now subscribed to *%s-%s* short-term signals.', $currency, $crypto),
+                            'Markdown'
+                        );
                         break;
                 }
             }

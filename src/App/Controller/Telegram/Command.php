@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Webhook\Telegram;
+namespace App\Controller\Telegram;
 
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
@@ -31,7 +31,7 @@ MARKDOWN;
             },
             function (Update $an_update) {
                 $received_message = $an_update->getMessage();
-                
+
                 $is_not_a_message = (null === $received_message || !$received_message instanceof TelegramMessage);
                 if ($is_not_a_message)
                 {
@@ -86,6 +86,29 @@ MARKDOWN;
                             [
                                 ['text' => 'USD', 'callback_data' => json_encode(['method' => 'insights_ask_stock', 'currency' => 'USD'])],
                                 ['text' => 'EUR', 'callback_data' => json_encode(['method' => 'insights_ask_stock', 'currency' => 'EUR'])]
+                            ]
+                        ]
+                    )
+                );
+            }
+        );
+
+        $bot->command(
+            'subscribe',
+            function (TelegramMessage $message) use ($bot) {
+                $chat_id = $message->getChat()->getId();
+
+                $bot->sendMessage(
+                    $chat_id,
+                    'Ok, I will contact you when relevant changes happen to your chosen pair.',
+                    null,
+                    false,
+                    null,
+                    new InlineKeyboardMarkup(
+                        [
+                            [
+                                ['text' => 'USD', 'callback_data' => json_encode(['method' => 'subscribe_ask_stock', 'currency' => 'USD'])],
+                                ['text' => 'EUR', 'callback_data' => json_encode(['method' => 'subscribe_ask_stock', 'currency' => 'EUR'])]
                             ]
                         ]
                     )

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class Signals extends Command
 {
-    private const DEFAULT_PAIRS = [
+    public const DEFAULT_PAIRS = [
         ['EUR', 'BTC'],
         ['EUR', 'ETH'],
         ['EUR', 'XRP'],

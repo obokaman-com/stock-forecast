@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Webhook\Telegram;
+namespace App\Controller\Telegram;
 
 use Obokaman\StockForecast\Application\Service\GetSignalsFromForecast;
 use Obokaman\StockForecast\Application\Service\GetSignalsFromForecastRequest;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
 
-class Telegram
+class Webhook
 {
     private $stock_predict_service;
     private $get_signals_service;

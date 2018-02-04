@@ -4,7 +4,7 @@ index:
 
 telegram_webhook:
     path: /webhook/telegram/{token}/
-    defaults: { _controller: 'App\Controller\Webhook\Telegram\Telegram::index' }
+    defaults: { _controller: 'App\Controller\Telegram\Webhook::index' }
 
 # first, run composer req annotations
 #controllers:
