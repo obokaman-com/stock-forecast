@@ -41,6 +41,12 @@ final class Callback
                                             )
                                         ],
                                         [
+                                            'text'          => 'BCH',
+                                            'callback_data' => json_encode(
+                                                ['method' => 'insights', 'currency' => $callback_data['currency'], 'crypto' => 'BCH']
+                                            )
+                                        ],
+                                        [
                                             'text'          => 'ETH',
                                             'callback_data' => json_encode(
                                                 ['method' => 'insights', 'currency' => $callback_data['currency'], 'crypto' => 'ETH']
@@ -130,6 +136,12 @@ final class Callback
                                             'text'          => 'BTC',
                                             'callback_data' => json_encode(
                                                 ['method' => 'subscribe', 'currency' => $callback_data['currency'], 'crypto' => 'BTC']
+                                            )
+                                        ],
+                                        [
+                                            'text'          => 'BCH',
+                                            'callback_data' => json_encode(
+                                                ['method' => 'subscribe', 'currency' => $callback_data['currency'], 'crypto' => 'BCH']
                                             )
                                         ],
                                         [

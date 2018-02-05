@@ -6,6 +6,7 @@ use Obokaman\StockForecast\Application\Service\GetSignalsFromForecast;
 use Obokaman\StockForecast\Application\Service\GetSignalsFromForecastRequest;
 use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
+use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -71,6 +72,11 @@ class Webhook
         foreach ($signals_response as $signal)
         {
             $message .= '_ - ' . $signal . '_' . PHP_EOL;
+        }
+
+        if (Interval::MINUTES === $interval_unit)
+        {
+            $message = 'Last price: ' . $prediction_response->realMeasurements()->end()->close() . ' ' . $currency . PHP_EOL . $message;
         }
 
         return $message . PHP_EOL;

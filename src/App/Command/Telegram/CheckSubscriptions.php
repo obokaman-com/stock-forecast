@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class CheckSubscriptions extends Command
 {
@@ -81,7 +82,19 @@ class CheckSubscriptions extends Command
                 $bot->sendMessage(
                     $input->getArgument('telegram_message_id'),
                     $message,
-                    'Markdown'
+                    'Markdown',
+                    false,
+                    null,
+                    new InlineKeyboardMarkup(
+                        [
+                            [
+                                [
+                                    'text' => 'View ' . $currency . '-' . $stock . ' chart online',
+                                    'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($stock) . '/charts/' . strtolower($currency)
+                                ]
+                            ]
+                        ]
+                    )
                 );
             }
         }
