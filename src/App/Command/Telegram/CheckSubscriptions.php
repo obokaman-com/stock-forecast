@@ -20,7 +20,7 @@ use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class CheckSubscriptions extends Command
 {
-    private const DEFAULT_SCORE_THRESHOLD = 2;
+    private const DEFAULT_SCORE_THRESHOLD = 3;
 
     private $stock_predict_service;
     private $get_signals_service;
@@ -65,11 +65,11 @@ class CheckSubscriptions extends Command
                 );
                 $signals         = $this->get_signals_service->getSignals($signals_request);
                 $score           = CalculateScore::calculate(...$signals);
-                $score_threshold = $input->getOption('score_threshold');
+                $score_threshold = $input->getOption('score_threshold') ?: self::DEFAULT_SCORE_THRESHOLD;
 
                 if ($score <= $score_threshold && $score >= -$score_threshold)
                 {
-                    return;
+                    continue;
                 }
 
                 $message = 'Signals for *' . $currency . '-' . $stock . '* in *last 60 minutes* (Score: ' . $score . '):' . PHP_EOL;
@@ -102,17 +102,5 @@ class CheckSubscriptions extends Command
         {
             $output->writeln('There was an error: [' . \get_class($e) . '] ' . $e->getMessage());
         }
-    }
-
-    private function outputPairSignals(PredictStockValueResponse $prediction_response): array
-    {
-        $signals_request = new GetSignalsFromForecastRequest(
-            $prediction_response->realMeasurements(),
-            $prediction_response->shortTermPredictions(),
-            $prediction_response->mediumTermPredicitons(),
-            $prediction_response->longTermPredictions()
-        );
-
-        return $this->get_signals_service->getSignals($signals_request);
     }
 }
