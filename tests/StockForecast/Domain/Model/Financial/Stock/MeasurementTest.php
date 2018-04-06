@@ -2,6 +2,7 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Financial\Stock;
 
+use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use PHPUnit\Framework\TestCase;
 
 class MeasurementTest extends TestCase

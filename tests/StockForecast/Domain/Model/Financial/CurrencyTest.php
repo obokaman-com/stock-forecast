@@ -45,12 +45,12 @@ class CurrencyTest extends TestCase
         $this->currency = Currency::fromCode('OBOKAMAN');
     }
 
-    private function whenITryToCreateAnValidCurrency($currency_code)
+    private function whenITryToCreateAnValidCurrency(string $currency_code)
     {
         $this->currency = Currency::fromCode($currency_code);
     }
 
-    private function thenIObtainAValidCurrency($currency_code)
+    private function thenIObtainAValidCurrency(string $currency_code)
     {
         $this->assertEquals($currency_code, (string) $this->currency);
     }

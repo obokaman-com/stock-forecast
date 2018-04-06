@@ -3,12 +3,13 @@
 namespace App\Command\Telegram;
 
 use App\Command\Signals;
-use Obokaman\StockForecast\Application\Service\GetSignalsFromForecast;
 use Obokaman\StockForecast\Application\Service\GetSignalsFromForecastRequest;
-use Obokaman\StockForecast\Application\Service\PredictStockValue;
-use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
-use Obokaman\StockForecast\Application\Service\PredictStockValueResponse;
+use Obokaman\StockForecast\Domain\Model\Date\Interval;
+use Obokaman\StockForecast\Domain\Model\Financial\Currency;
+use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
 use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
+use Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements;
+use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Collector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,13 +23,13 @@ class CheckSubscriptions extends Command
 {
     private const DEFAULT_SCORE_THRESHOLD = 3;
 
-    private $stock_predict_service;
+    private $stock_measurements_collector;
     private $get_signals_service;
 
-    public function __construct(PredictStockValue $a_stock_predict_service, GetSignalsFromForecast $a_get_signals_service)
+    public function __construct(Collector $a_stock_measurements_collector, GetSignalsFromMeasurements $a_get_signals_service)
     {
-        $this->stock_predict_service = $a_stock_predict_service;
-        $this->get_signals_service   = $a_get_signals_service;
+        $this->stock_measurements_collector = $a_stock_measurements_collector;
+        $this->get_signals_service          = $a_get_signals_service;
 
         parent::__construct();
     }
@@ -54,16 +55,14 @@ class CheckSubscriptions extends Command
             {
                 [$currency, $stock] = $pair;
 
-                $prediction_request  = new PredictStockValueRequest($currency, $stock, 'minutes');
-                $prediction_response = $this->stock_predict_service->predict($prediction_request);
-
-                $signals_request = new GetSignalsFromForecastRequest(
-                    $prediction_response->realMeasurements(),
-                    $prediction_response->shortTermPredictions(),
-                    $prediction_response->mediumTermPredicitons(),
-                    $prediction_response->longTermPredictions()
+                $measurements = $this->stock_measurements_collector->getMeasurements(
+                    Currency::fromCode($currency),
+                    Stock::fromCode($stock),
+                    Interval::fromStringDateInterval('minutes')
                 );
-                $signals         = $this->get_signals_service->getSignals($signals_request);
+
+                $signals         = $this->get_signals_service->getSignals($measurements);
+
                 $score           = CalculateScore::calculate(...$signals);
                 $score_threshold = $input->getOption('score_threshold') ?: self::DEFAULT_SCORE_THRESHOLD;
 
@@ -77,7 +76,7 @@ class CheckSubscriptions extends Command
                 {
                     $message .= '- _' . $signal . '_' . PHP_EOL;
                 }
-                $message .= 'Now selling at *' . $prediction_response->realMeasurements()->end()->close() . ' ' . $currency . '*';
+                $message .= 'Now selling at *' . $measurements->end()->close() . ' ' . $currency . '*';
 
                 $bot->sendMessage(
                     $input->getArgument('telegram_message_id'),

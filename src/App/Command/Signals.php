@@ -2,13 +2,12 @@
 
 namespace App\Command;
 
-use Obokaman\StockForecast\Application\Service\GetSignalsFromForecast;
-use Obokaman\StockForecast\Application\Service\GetSignalsFromForecastRequest;
 use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement;
 use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
+use Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,7 +32,7 @@ final class Signals extends Command
     /** @var OutputInterface */
     private $output;
 
-    public function __construct(PredictStockValue $a_stock_predict_service, GetSignalsFromForecast $a_get_signals_service)
+    public function __construct(PredictStockValue $a_stock_predict_service, GetSignalsFromMeasurements $a_get_signals_service)
     {
         $this->stock_predict_service = $a_stock_predict_service;
         $this->get_signals_service   = $a_get_signals_service;
@@ -127,15 +126,9 @@ final class Signals extends Command
         $prediction_request  = new PredictStockValueRequest($currency, $stock, $interval_unit);
         $prediction_response = $this->stock_predict_service->predict($prediction_request);
 
-        $signals_request  = new GetSignalsFromForecastRequest(
-            $prediction_response->realMeasurements(),
-            $prediction_response->shortTermPredictions(),
-            $prediction_response->mediumTermPredicitons(),
-            $prediction_response->longTermPredictions()
-        );
-        $signals_response = $this->get_signals_service->getSignals($signals_request);
+        $signals = $this->get_signals_service->getSignals($prediction_response->realMeasurements());
 
-        $this->output->writeln('<options=bold>Signals based on last ' . $interval . ' (Score: ' . CalculateScore::calculate(...$signals_response) . '):</>');
+        $this->output->writeln('<options=bold>Signals based on last ' . $interval . ' (Score: ' . CalculateScore::calculate(...$signals) . '):</>');
 
         if ($this->input->getOption('table_output'))
         {
@@ -146,7 +139,7 @@ final class Signals extends Command
             );
         }
 
-        foreach ($signals_response as $signal)
+        foreach ($signals as $signal)
         {
             $this->output->writeln(' - <comment>' . $signal . '</comment>');
         }
