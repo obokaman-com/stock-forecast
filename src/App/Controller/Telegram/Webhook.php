@@ -74,7 +74,7 @@ class Webhook
 
         if (Interval::MINUTES === $interval_unit)
         {
-            $message = 'Last price: ' . $measurements->realMeasurements()->end()->close() . ' ' . $currency . PHP_EOL . $message;
+            $message = 'Last price: ' . $measurements->end()->close() . ' ' . $currency . PHP_EOL . $message;
         }
 
         return $message . PHP_EOL;
