@@ -18,7 +18,7 @@ Install Homebrew (package manager) if you don't have it yet, and install Git + P
 
 ```bash
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)`
-$ brew install git php72 php72-xdebug composer
+$ brew install git php composer
 ```
 
 **Download app and install all dependencies**
@@ -99,3 +99,10 @@ Signals based on last month (Score: 3):
 
 There is a `forecast:test` command too that allow you to test different predicition strategies with sample sequences.
 
+#### Telegram bot (@CryptoInsightsBot)
+
+You can use this project to run a robo-advisor using Telegram. You'll find some commands and callbacks implemented under `App/Controller/Telegram`. 
+
+If you want to test with your own bot, you should add an environment variable called `TELEGRAM_BOT_TOKEN`, with your assigned token. More information about creating your own Telegram bot on https://core.telegram.org/bots 
+
+An example Telegram bot is running as @CryptoInsightsBot. You can test it at https://t.me/CryptoInsightsBot
