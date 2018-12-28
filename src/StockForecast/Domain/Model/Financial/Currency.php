@@ -32,4 +32,9 @@ final class Currency
     {
         return $this->code;
     }
+
+    public function equals(Currency $a_currency): bool
+    {
+        return $this->code === $a_currency->code;
+    }
 }

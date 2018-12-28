@@ -1,0 +1,13 @@
+Obokaman\StockForecast\Domain\Model\Subscriber\Subscription:
+    type: entity
+    id:
+        subscriber:
+            associationKey: true
+        currency:
+            type: currency
+        stock:
+            type: stock
+    manyToOne:
+        subscriber:
+            targetEntity: Obokaman\StockForecast\Domain\Model\Subscriber\Subscriber
+            inversedBy: subscriptions

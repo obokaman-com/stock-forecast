@@ -22,4 +22,9 @@ final class Stock
     {
         return $this->code;
     }
+
+    public function equals(Stock $a_stock): bool
+    {
+        return $this->code === $a_stock->code;
+    }
 }

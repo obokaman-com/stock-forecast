@@ -6,6 +6,7 @@ use App\Command\Signals;
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
+use Obokaman\StockForecast\Domain\Model\Subscriber\SubscriberRepository;
 use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
 use Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements;
 use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Collector;
@@ -24,13 +25,20 @@ class CheckSubscriptions extends Command
 
     private $stock_measurements_collector;
     private $get_signals_service;
+    private $subscriber_repository;
+    private $input;
+    private $output;
+    /** @var TelegramClient|BotApi */
+    private $bot;
 
     public function __construct(
         Collector $a_stock_measurements_collector,
-        GetSignalsFromMeasurements $a_get_signals_service
+        GetSignalsFromMeasurements $a_get_signals_service,
+        SubscriberRepository $a_subscriber_repository
     ) {
         $this->stock_measurements_collector = $a_stock_measurements_collector;
         $this->get_signals_service          = $a_get_signals_service;
+        $this->subscriber_repository        = $a_subscriber_repository;
 
         parent::__construct();
     }
@@ -46,22 +54,54 @@ class CheckSubscriptions extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        /** @var TelegramClient|BotApi $bot */
-        $bot = new TelegramClient($_SERVER['TELEGRAM_BOT_TOKEN']);
+        $this->input    = $input;
+        $this->output   = $output;
+        $this->bot      = new TelegramClient($_SERVER['TELEGRAM_BOT_TOKEN']);
+        $subscriber_ids = [];
+        $pairs          = [];
 
-        try {
-            $pairs = Signals::DEFAULT_PAIRS;
-            foreach ($pairs as $pair) {
+        $score_threshold  = $this->input->getOption('score_threshold') ?: self::DEFAULT_SCORE_THRESHOLD;
+        $telegram_chat_id = $this->input->getArgument('telegram_message_id');
+
+        if (!empty($telegram_chat_id)) {
+            $subscriber_ids[]         = $telegram_chat_id;
+            $pairs[$telegram_chat_id] = Signals::DEFAULT_PAIRS;
+        } else {
+            $subscribers = $this->subscriber_repository->findAll();
+            foreach ($subscribers as $subscriber) {
+                $subscriber_id    = $subscriber->chatId()->id();
+                $subscriber_ids[] = $subscriber_id;
+                $subscriptions    = $subscriber->subscriptions();
+                foreach ($subscriptions as $subscription) {
+                    $pairs[$subscriber_id][] = [(string)$subscription->currency(), (string)$subscription->stock()];
+                }
+                $pairs[$subscriber_id] = Signals::DEFAULT_PAIRS;
+            }
+        }
+
+        foreach ($subscriber_ids as $subscriber) {
+            $this->checkSubscribedAlerts($subscriber, $pairs[$subscriber], $score_threshold);
+        }
+    }
+
+    /**
+     * @param       $telegram_message_id
+     * @param array $pairs
+     * @param int   $score_threshold
+     */
+    protected function checkSubscribedAlerts($telegram_message_id, array $pairs, int $score_threshold): void
+    {
+        foreach ($pairs as $pair) {
+            try {
                 [$currency, $stock] = $pair;
 
                 $measurements = $this->stock_measurements_collector->getMeasurements(Currency::fromCode($currency),
-                    Stock::fromCode($stock),
-                    Interval::fromStringDateInterval('minutes'));
+                                                                                     Stock::fromCode($stock),
+                                                                                     Interval::fromStringDateInterval('minutes'));
 
                 $signals = $this->get_signals_service->getSignals($measurements);
 
-                $score           = CalculateScore::calculate(...$signals);
-                $score_threshold = $input->getOption('score_threshold') ?: self::DEFAULT_SCORE_THRESHOLD;
+                $score = CalculateScore::calculate(...$signals);
 
                 if ($score <= $score_threshold && $score >= -$score_threshold) {
                     continue;
@@ -73,22 +113,22 @@ class CheckSubscriptions extends Command
                 }
                 $message .= 'Now selling at *' . $measurements->end()->close() . ' ' . $currency . '*';
 
-                $bot->sendMessage($input->getArgument('telegram_message_id'),
-                    $message,
-                    'Markdown',
-                    false,
-                    null,
-                    new InlineKeyboardMarkup([
-                        [
-                            [
-                                'text' => 'View ' . $currency . '-' . $stock . ' chart online',
-                                'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($stock) . '/charts/' . strtolower($currency)
-                            ]
-                        ]
-                    ]));
+                $this->bot->sendMessage($telegram_message_id,
+                                        $message,
+                                        'Markdown',
+                                        false,
+                                        null,
+                                        new InlineKeyboardMarkup([
+                                                                     [
+                                                                         [
+                                                                             'text' => 'View ' . $currency . '-' . $stock . ' chart online',
+                                                                             'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($stock) . '/charts/' . strtolower($currency)
+                                                                         ]
+                                                                     ]
+                                                                 ]));
+            } catch (\Exception $e) {
+                $this->output->writeln('There was an error: [' . \get_class($e) . '] ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            $output->writeln('There was an error: [' . \get_class($e) . '] ' . $e->getMessage());
         }
     }
 }

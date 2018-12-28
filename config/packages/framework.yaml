@@ -10,5 +10,6 @@ framework:
     #    save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
     #esi: ~
     #fragments: ~
+    ide: 'phpstorm://open?file=%%f&line=%%l'
     php_errors:
         log: true

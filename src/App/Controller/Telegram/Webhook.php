@@ -5,6 +5,7 @@ namespace App\Controller\Telegram;
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
+use Obokaman\StockForecast\Domain\Model\Subscriber\SubscriberRepository;
 use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
 use Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements;
 use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Collector;
@@ -17,13 +18,16 @@ class Webhook
 {
     private $stock_measurement_collector;
     private $get_signals_service;
+    private $subscriber_repository;
 
     public function __construct(
         Collector $a_stock_measurement_collector,
-        GetSignalsFromMeasurements $a_get_signals_service
+        GetSignalsFromMeasurements $a_get_signals_service,
+        SubscriberRepository $a_subscriber_repository
     ) {
         $this->stock_measurement_collector = $a_stock_measurement_collector;
         $this->get_signals_service         = $a_get_signals_service;
+        $this->subscriber_repository       = $a_subscriber_repository;
     }
 
     public function index(string $token): JsonResponse
@@ -42,9 +46,9 @@ class Webhook
             $bot->run();
         } catch (\Exception $e) {
             return new JsonResponse([
-                'error'   => \get_class($e),
-                'message' => $e->getMessage()
-            ]);
+                                        'error'   => \get_class($e),
+                                        'message' => $e->getMessage()
+                                    ]);
         }
 
         return new JsonResponse([]);
@@ -57,8 +61,8 @@ class Webhook
         string $stock
     ): string {
         $measurements = $this->stock_measurement_collector->getMeasurements(Currency::fromCode($currency),
-            Stock::fromCode($stock),
-            Interval::fromStringDateInterval($interval_unit));
+                                                                            Stock::fromCode($stock),
+                                                                            Interval::fromStringDateInterval($interval_unit));
 
         $signals_response = $this->get_signals_service->getSignals($measurements);
 
@@ -74,5 +78,10 @@ class Webhook
         }
 
         return $message . PHP_EOL;
+    }
+
+    public function subscriberRepo(): SubscriberRepository
+    {
+        return $this->subscriber_repository;
     }
 }
