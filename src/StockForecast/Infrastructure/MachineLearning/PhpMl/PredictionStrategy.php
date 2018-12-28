@@ -28,26 +28,20 @@ abstract class PredictionStrategy implements PredictionStrategyContract
     {
         $this->data_sequence = $data_sequence;
 
-        $sample_range = array_map(
-            function ($sequence)
-            {
-                return [$sequence];
-            },
-            range(1, \count($this->data_sequence))
-        );
+        $sample_range = array_map(function ($sequence) {
+            return [$sequence];
+        },
+            range(1, \count($this->data_sequence)));
 
         $this->php_ml->train($sample_range, $data_sequence);
     }
 
     public function predictNext(int $quantity = 1)
     {
-        $prediction_sample = array_map(
-            function ($sequence)
-            {
-                return [$sequence];
-            },
-            range(\count($this->data_sequence) + 1, \count($this->data_sequence) + $quantity)
-        );
+        $prediction_sample = array_map(function ($sequence) {
+            return [$sequence];
+        },
+            range(\count($this->data_sequence) + 1, \count($this->data_sequence) + $quantity));
 
         return $this->php_ml->predict($prediction_sample);
     }

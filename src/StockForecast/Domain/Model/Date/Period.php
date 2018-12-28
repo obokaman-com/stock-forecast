@@ -4,9 +4,9 @@ namespace Obokaman\StockForecast\Domain\Model\Date;
 
 class Period
 {
-    public const SHORT = 'short';
+    public const SHORT  = 'short';
     public const MEDIUM = 'medium';
-    public const LONG = 'long';
+    public const LONG   = 'long';
 
     private const SHORT_PERIOD = [
         Interval::DAYS    => 7,
@@ -28,12 +28,10 @@ class Period
 
     public static function getPeriod(Interval $an_interval, string $a_period): int
     {
-        if (self::SHORT === $a_period)
-        {
+        if (self::SHORT === $a_period) {
             return self::getShort($an_interval);
         }
-        if (self::MEDIUM === $a_period)
-        {
+        if (self::MEDIUM === $a_period) {
             return self::getMedium($an_interval);
         }
 

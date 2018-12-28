@@ -18,17 +18,11 @@ final class PredictStockValue
 
     public function predict(PredictStockValueRequest $a_request): PredictStockValueResponse
     {
-        $long_term_measurements = $this->stock_measurement_collector->getMeasurements(
-            $a_request->currency(),
-            $a_request->stock(),
-            $a_request->dateInterval()
-        );
+        $long_term_measurements = $this->stock_measurement_collector->getMeasurements($a_request->currency(), $a_request->stock(), $a_request->dateInterval());
 
-        return new PredictStockValueResponse(
-            $long_term_measurements,
+        return new PredictStockValueResponse($long_term_measurements,
             $this->prediction_service->predict($long_term_measurements->filterByPeriod('short')),
             $this->prediction_service->predict($long_term_measurements->filterByPeriod('medium')),
-            $this->prediction_service->predict($long_term_measurements)
-        );
+            $this->prediction_service->predict($long_term_measurements));
     }
 }

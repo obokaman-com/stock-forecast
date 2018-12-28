@@ -15,16 +15,16 @@ class StockTest extends TestCase
     public function shouldConvertStockCodeToUppercase()
     {
         $this->whenITryToCreateAnValidStock('appl');
-        $this->thenIObtainAValidCurrency('APPL');
+        $this->thenIObtainAValidStock('APPL');
     }
 
-    private function whenITryToCreateAnValidStock($stock_code)
+    private function whenITryToCreateAnValidStock(string $stock_code)
     {
         $this->stock = Stock::fromCode($stock_code);
     }
 
-    private function thenIObtainAValidCurrency($currency_code)
+    private function thenIObtainAValidStock(string $stock_code)
     {
-        $this->assertEquals($currency_code, (string) $this->stock);
+        $this->assertEquals($stock_code, (string) $this->stock);
     }
 }

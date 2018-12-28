@@ -28,24 +28,18 @@ final class Predict extends Command
     protected function configure(): void
     {
         $this->setName('forecast:stock')
-            ->setDescription('Generates a forecast of stock future prices.')
-            ->setHelp(
-                'This command allow you to predict a stock future value...'
-            )
-            ->addArgument('currency', InputArgument::OPTIONAL, 'The currency code.', 'USD')
-            ->addArgument('stock', InputArgument::OPTIONAL, 'The stock code.', 'BTC')
-            ->addArgument('date_interval', InputArgument::OPTIONAL, 'The date interval to use in the forecast (minutes, hours, days).', 'days');
+             ->setDescription('Generates a forecast of stock future prices.')
+             ->setHelp('This command allow you to predict a stock future value...')
+             ->addArgument('currency', InputArgument::OPTIONAL, 'The currency code.', 'USD')
+             ->addArgument('stock', InputArgument::OPTIONAL, 'The stock code.', 'BTC')
+             ->addArgument('date_interval', InputArgument::OPTIONAL, 'The date interval to use in the forecast (minutes, hours, days).', 'days');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->outputCommandTitle($input, $output);
 
-        $prediction_request = new PredictStockValueRequest(
-            $input->getArgument('currency'),
-            $input->getArgument('stock'),
-            $input->getArgument('date_interval')
-        );
+        $prediction_request = new PredictStockValueRequest($input->getArgument('currency'), $input->getArgument('stock'), $input->getArgument('date_interval'));
 
         $prediction_response = $this->stock_predict_service->predict($prediction_request);
 
@@ -56,25 +50,19 @@ final class Predict extends Command
         $this->outputChangeTable($output, $prediction_response->realMeasurements());
 
         $output->writeln('<options=bold>Forecast for next ' . $input->getArgument('date_interval') . ':</>');
-        $this->outputForecastTable(
-            $output,
+        $this->outputForecastTable($output,
             $prediction_response->shortTermPredictions(),
-            $prediction_response->mediumTermPredicitons(),
-            $prediction_response->longTermPredictions()
-        );
+            $prediction_response->mediumTermPredictions(),
+            $prediction_response->longTermPredictions());
     }
 
     private function outputCommandTitle(InputInterface $input, OutputInterface $output): void
     {
-        $output->writeln(
-            sprintf(
-                '<options=bold>===== BUILDING FORECAST FOR <info>%s - %s</info> USING DATA FROM LAST %d %s =====</>',
-                $input->getArgument('stock'),
-                $input->getArgument('currency'),
-                Period::getLong(Interval::fromStringDateInterval($input->getArgument('date_interval'))),
-                $input->getArgument('date_interval')
-            )
-        );
+        $output->writeln(sprintf('<options=bold>===== BUILDING FORECAST FOR <info>%s - %s</info> USING DATA FROM LAST %d %s =====</>',
+            $input->getArgument('stock'),
+            $input->getArgument('currency'),
+            Period::getLong(Interval::fromStringDateInterval($input->getArgument('date_interval'))),
+            $input->getArgument('date_interval')));
         $output->writeln('');
     }
 
@@ -83,30 +71,37 @@ final class Predict extends Command
         $table = new Table($output);
         $table->setHeaders(['Date', 'Open', 'Close', 'Change', 'Change (%)', 'High', 'Low', 'Volatility', 'Volume']);
 
-        foreach ($measurements as $stock_stats)
-        {
-            $table->addRow(
-                [
-                    $stock_stats->timestamp()->format('Y-m-d H:i'),
-                    $stock_stats->open(),
-                    $stock_stats->close(),
-                    $stock_stats->change(),
-                    $stock_stats->changePercent() . '%',
-                    $stock_stats->high(),
-                    $stock_stats->low(),
-                    $stock_stats->volatility(),
-                    $stock_stats->volume()
-                ]
-            );
+        foreach ($measurements as $stock_stats) {
+            $table->addRow([
+                $stock_stats->timestamp()->format('Y-m-d H:i'),
+                $stock_stats->open(),
+                $stock_stats->close(),
+                $stock_stats->change(),
+                $stock_stats->changePercent() . '%',
+                $stock_stats->high(),
+                $stock_stats->low(),
+                $stock_stats->volatility(),
+                $stock_stats->volume()
+            ]);
         }
         $table->render();
         $output->writeln('');
     }
 
-    private function outputForecastTable(OutputInterface $output, MeasurementCollection ...$stock_predictions)
+    private function outputForecastTable(OutputInterface $output, MeasurementCollection ...$stock_predictions): void
     {
         $table = new Table($output);
-        $table->setHeaders(['Date interval', 'Open', 'Close', 'Change', 'Change (%)', 'High', 'Low', 'Volatility', 'Volume']);
+        $table->setHeaders([
+            'Date interval',
+            'Open',
+            'Close',
+            'Change',
+            'Change (%)',
+            'High',
+            'Low',
+            'Volatility',
+            'Volume'
+        ]);
 
         [$short_term_predictions, $mid_term_predictions, $long_term_predictions] = $stock_predictions;
 
@@ -120,51 +115,43 @@ final class Predict extends Command
 
     private function addStocksTableRow(Table $table, string $label, Measurement $stats): void
     {
-        $table->addRow(
-            [
-                $label,
-                $stats->open(),
-                $stats->close(),
-                $stats->change(),
-                $stats->changePercent() . '%',
-                $stats->high(),
-                $stats->low(),
-                $stats->volatility(),
-                $stats->volume()
-            ]
-        );
+        $table->addRow([
+            $label,
+            $stats->open(),
+            $stats->close(),
+            $stats->change(),
+            $stats->changePercent() . '%',
+            $stats->high(),
+            $stats->low(),
+            $stats->volatility(),
+            $stats->volume()
+        ]);
     }
 
-    private function outputChangeTable(OutputInterface $output, MeasurementCollection $long_term_measurements)
+    private function outputChangeTable(OutputInterface $output, MeasurementCollection $long_term_measurements): void
     {
         $table = new Table($output);
         $table->setHeaders(['Date interval', 'Aggregated Change', 'Aggregated Change (%)']);
 
         $short_term_measurements = $long_term_measurements->filterByPeriod(Period::SHORT);
-        $table->addRow(
-            [
-                'Short term',
-                $short_term_measurements->priceChangeAmount(),
-                $short_term_measurements->priceChangePercent() . '%'
-            ]
-        );
+        $table->addRow([
+            'Short term',
+            $short_term_measurements->priceChangeAmount(),
+            $short_term_measurements->priceChangePercent() . '%'
+        ]);
 
         $mid_term_measurements = $long_term_measurements->filterByPeriod(Period::MEDIUM);
-        $table->addRow(
-            [
-                'Medium term',
-                $mid_term_measurements->priceChangeAmount(),
-                $mid_term_measurements->priceChangePercent() . '%'
-            ]
-        );
+        $table->addRow([
+            'Medium term',
+            $mid_term_measurements->priceChangeAmount(),
+            $mid_term_measurements->priceChangePercent() . '%'
+        ]);
 
-        $table->addRow(
-            [
-                'Long term',
-                $long_term_measurements->priceChangeAmount(),
-                $long_term_measurements->priceChangePercent() . '%'
-            ]
-        );
+        $table->addRow([
+            'Long term',
+            $long_term_measurements->priceChangeAmount(),
+            $long_term_measurements->priceChangePercent() . '%'
+        ]);
 
         $table->render();
         $output->writeln('');

@@ -9,13 +9,11 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 
     public function __construct(array $items = null)
     {
-        if (null === $items)
-        {
+        if (null === $items) {
             return;
         }
 
-        foreach ($items as $item)
-        {
+        foreach ($items as $item) {
             $this->addItem($item);
         }
     }
@@ -26,8 +24,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 
         $key = $this->getKey($item);
 
-        if (!isset($this->all_items[$key]))
-        {
+        if (!isset($this->all_items[$key])) {
             $this->all_items[$key] = $item;
         }
     }
@@ -47,8 +44,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 
         $key = $this->getKey($item);
 
-        if (!isset($this->all_items[$key]))
-        {
+        if (!isset($this->all_items[$key])) {
             throw new \RuntimeException('Item with key ' . $key . ' doesn\'t exist in ' . static::class);
         }
 
@@ -61,8 +57,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 
         $key = $this->getKey($item);
 
-        if (!isset($this->all_items[$key]))
-        {
+        if (!isset($this->all_items[$key])) {
             throw new \RuntimeException('Item with key ' . $key . ' doesn\'t exist in ' . static::class);
         }
 
@@ -90,13 +85,11 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
     {
         $class_name = $this->getItemsClassName();
 
-        if (null === $class_name)
-        {
+        if (null === $class_name) {
             return;
         }
 
-        if ($item instanceof $class_name)
-        {
+        if ($item instanceof $class_name) {
             return;
         }
 
@@ -105,7 +98,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 
     public function append(Collection $a_collection)
     {
-        $this->all_items += $a_collection->all_items;
+        array_push($this->all_items, ...$a_collection->all_items);
     }
 
     public function current()

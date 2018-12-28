@@ -18,6 +18,12 @@ services:
     App\:
         resource: '../src/App/*'
 
+    # controllers are imported separately to make sure they
+    # have the tag that allows actions to type-hint services
+    App\Controller\:
+        resource: '../src/App/Controller'
+        tags: ['controller.service_arguments']
+
     Obokaman\StockForecast\:
         resource: '../src/StockForecast/*'
 
@@ -28,8 +34,3 @@ services:
     #Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Infrastructure\MachineLearning\PhpMl\SupportVectorRegression'
 
 
-    # controllers are imported separately to make sure they
-    # have the tag that allows actions to type-hint services
-    #App\Controller\:
-    #    resource: '../src/Controller'
-    #    tags: ['controller.service_arguments']

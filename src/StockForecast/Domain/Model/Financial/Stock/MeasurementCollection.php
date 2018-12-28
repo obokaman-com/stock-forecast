@@ -23,7 +23,7 @@ class MeasurementCollection extends Collection
      */
     protected function getKey($item): string
     {
-        return (string) $item->timestamp()->getTimestamp();
+        return (string)$item->timestamp()->getTimestamp();
     }
 
     public function getIntervalBetweenMeasurements(): \DateInterval
@@ -43,9 +43,8 @@ class MeasurementCollection extends Collection
 
     public function filterByQuantity(int $quantity): MeasurementCollection
     {
-        if ($quantity > \count($this->all_items))
-        {
-            throw new \InvalidArgumentException('Trying to get more items than currenty available.');
+        if ($quantity > \count($this->all_items)) {
+            throw new \InvalidArgumentException('Trying to get more items than currently available.');
         }
 
         $items = \array_slice($this->all_items, -$quantity, $quantity);

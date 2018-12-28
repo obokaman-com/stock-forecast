@@ -23,8 +23,7 @@ final class Currency
 
     private static function assertValidCurrency(string $a_code): void
     {
-        if (!\in_array($a_code, self::VALID_CURRENCIES))
-        {
+        if (!\in_array($a_code, self::VALID_CURRENCIES, true)) {
             throw new \InvalidArgumentException($a_code . ' is not a valid currency.');
         }
     }

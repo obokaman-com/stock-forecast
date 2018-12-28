@@ -4,9 +4,9 @@ namespace Obokaman\StockForecast\Domain\Model\Date;
 
 final class Interval
 {
-    public const DAYS = 'days';
-    public const HOURS = 'hours';
-    public const MINUTES = 'minutes';
+    public const  DAYS            = 'days';
+    public const  HOURS           = 'hours';
+    public const  MINUTES         = 'minutes';
     private const VALID_INTERVALS = [self::DAYS, self::HOURS, self::MINUTES];
 
     private $interval;
@@ -20,8 +20,7 @@ final class Interval
 
     private function validateDateInterval(string $date_interval): void
     {
-        if (!\in_array($date_interval, self::VALID_INTERVALS, true))
-        {
+        if (!\in_array($date_interval, self::VALID_INTERVALS, true)) {
             throw new \InvalidArgumentException('Invalid date interval: ' . $date_interval . '. Valid intervals include: ' . implode(', ', self::VALID_INTERVALS));
         }
     }
@@ -33,18 +32,17 @@ final class Interval
 
     public static function fromDateInterval(\DateInterval $a_date_interval): Interval
     {
-        if (0 < $a_date_interval->d)
-        {
+        if (0 < $a_date_interval->d) {
             return new self(self::DAYS);
         }
-        if (0 < $a_date_interval->h)
-        {
+        if (0 < $a_date_interval->h) {
             return new self(self::HOURS);
         }
-        if (0 < $a_date_interval->i)
-        {
+        if (0 < $a_date_interval->i) {
             return new self(self::MINUTES);
         }
+
+        throw new \InvalidArgumentException('Given date interval is invalid');
     }
 
     public function isDays(): bool

@@ -16,8 +16,7 @@ final class PredictStockValueResponse
         MeasurementCollection $a_short_term_predictions,
         MeasurementCollection $a_medium_term_predictions,
         MeasurementCollection $a_long_term_predictions
-    )
-    {
+    ) {
         $this->real_measurements       = $a_real_stats;
         $this->short_term_predictions  = $a_short_term_predictions;
         $this->medium_term_predictions = $a_medium_term_predictions;
@@ -34,7 +33,7 @@ final class PredictStockValueResponse
         return $this->short_term_predictions;
     }
 
-    public function mediumTermPredicitons(): MeasurementCollection
+    public function mediumTermPredictions(): MeasurementCollection
     {
         return $this->medium_term_predictions;
     }

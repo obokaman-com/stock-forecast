@@ -23,8 +23,7 @@ class Predict
 
         $measurement_count = 0;
 
-        foreach ($source_data as $stock_stats)
-        {
+        foreach ($source_data as $stock_stats) {
             $target_data['close'][]       = $stock_stats->close();
             $target_data['change'][]      = $stock_stats->change();
             $target_data['high'][]        = $stock_stats->high();
@@ -41,10 +40,8 @@ class Predict
         $predicted_to    = $this->predictValues($target_data['volume_to']);
 
         $predictions = new MeasurementCollection();
-        for ($i = 0; $i < $measurement_count; $i++)
-        {
-            $current_measurement = new Measurement(
-                $last_stock_stats_measurement->currency(),
+        for ($i = 0; $i < $measurement_count; $i++) {
+            $current_measurement = new Measurement($last_stock_stats_measurement->currency(),
                 $last_stock_stats_measurement->stock(),
                 $last_stock_stats_measurement->timestamp()->add($a_measurement_collection->getIntervalBetweenMeasurements()),
                 $last_stock_stats_measurement->close(),
@@ -52,8 +49,7 @@ class Predict
                 $predicted_high[$i],
                 $predicted_low[$i],
                 $predicted_from[$i],
-                $predicted_to[$i]
-            );
+                $predicted_to[$i]);
 
             $predictions->addItem($current_measurement);
 
