@@ -8,8 +8,6 @@ class Home
 {
     public function index(): Response
     {
-        return new Response(
-            '<html><body>Hi there!</body></html>'
-        );
+        return new Response('<html><body>Hi there!</body></html>');
     }
 }

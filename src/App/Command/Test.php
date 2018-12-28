@@ -20,12 +20,12 @@ final class Test extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('forecast:test')
-            ->setDescription('Predict a stock future value.')
-            ->setHelp('This command allow you to predict a stock future value...')
-            ->addArgument('sequence', InputArgument::IS_ARRAY, '', self::SAMPLE_DATA);
+             ->setDescription('Predict a stock future value.')
+             ->setHelp('This command allow you to predict a stock future value...')
+             ->addArgument('sequence', InputArgument::IS_ARRAY, '', self::SAMPLE_DATA);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

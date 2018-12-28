@@ -9,8 +9,7 @@ class CalculateScore
     public static function calculate(Signal ...$signals): int
     {
         $score = 0;
-        foreach ($signals as $signal)
-        {
+        foreach ($signals as $signal) {
             $score += $signal->score();
         }
 

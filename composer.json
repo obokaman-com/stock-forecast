@@ -3,6 +3,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.1",
+        "ext-json": "^1.6",
         "php-ai/php-ml": "^0.5",
         "symfony/console": "^4.0",
         "symfony/flex": "^1.0",

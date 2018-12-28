@@ -15,29 +15,27 @@ class Collector implements CollectorContract
 {
     private const API_URL = 'https://min-api.cryptocompare.com/data/%s?fsym=%s&tsym=%s&limit=%d&aggregate=1';
 
-    public function getMeasurements(Currency $a_currency, Stock $a_stock, Interval $a_date_interval): MeasurementCollection
-    {
-        $api_method  = $this->getApiMethodForInterval($a_date_interval);
-        $api_url     = sprintf(self::API_URL, $api_method, $a_stock, $a_currency, Period::getLong($a_date_interval) - 1);
-        $response    = $this->collectStockInformationFromRemoteApi($api_url);
+    public function getMeasurements(
+        Currency $a_currency,
+        Stock $a_stock,
+        Interval $a_date_interval
+    ): MeasurementCollection {
+        $api_method = $this->getApiMethodForInterval($a_date_interval);
+        $api_url    = sprintf(self::API_URL, $api_method, $a_stock, $a_currency, Period::getLong($a_date_interval) - 1);
+        $response   = $this->collectStockInformationFromRemoteApi($api_url);
 
         $stats_array = new MeasurementCollection();
 
-        foreach ($response as $stats)
-        {
-            $stats_array->addItem(
-                new Measurement(
-                    $a_currency,
-                    $a_stock,
-                    (new \DateTimeImmutable())->setTimestamp($stats['time']),
-                    $stats['open'],
-                    $stats['close'],
-                    $stats['high'],
-                    $stats['low'],
-                    $stats['volumefrom'],
-                    $stats['volumeto']
-                )
-            );
+        foreach ($response as $stats) {
+            $stats_array->addItem(new Measurement($a_currency,
+                $a_stock,
+                (new \DateTimeImmutable())->setTimestamp($stats['time']),
+                $stats['open'],
+                $stats['close'],
+                $stats['high'],
+                $stats['low'],
+                $stats['volumefrom'],
+                $stats['volumeto']));
         }
 
         return $stats_array;
@@ -47,33 +45,28 @@ class Collector implements CollectorContract
     {
         $response = json_decode(file_get_contents($api_url), true) ?: [];
 
-        if (empty($response))
-        {
+        if (empty($response)) {
             throw new CollectException();
         }
 
-        if (empty($response['Data']))
-        {
+        if (empty($response['Data'])) {
             throw new CollectException($response['Message'] ?? null);
         }
 
         return $response['Data'];
     }
 
-    private function getApiMethodForInterval(Interval $a_date_interval)
+    private function getApiMethodForInterval(Interval $a_date_interval): string
     {
-        if ($a_date_interval->isDays())
-        {
+        if ($a_date_interval->isDays()) {
             return 'histoday';
         }
 
-        if ($a_date_interval->isHours())
-        {
+        if ($a_date_interval->isHours()) {
             return 'histohour';
         }
 
-        if ($a_date_interval->isMinutes())
-        {
+        if ($a_date_interval->isMinutes()) {
             return 'histominute';
         }
 

@@ -26,8 +26,7 @@ final class Measurement
         float $a_low,
         float $a_volume_from,
         float $a_volume_to
-    )
-    {
+    ) {
         $this->currency    = $a_currency;
         $this->stock       = $a_stock;
         $this->timestamp   = $a_timestamp;
@@ -106,13 +105,11 @@ final class Measurement
 
     private function sensitiveRound(float $amount): float
     {
-        if (0.001 > abs($amount))
-        {
+        if (0.001 > abs($amount)) {
             return round($amount, 4);
         }
 
-        if (0.01 > abs($amount))
-        {
+        if (0.01 > abs($amount)) {
             return round($amount, 3);
         }
 

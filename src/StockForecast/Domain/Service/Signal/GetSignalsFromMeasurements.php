@@ -10,8 +10,8 @@ use Obokaman\StockForecast\Domain\Service\Predict\Predict;
 final class GetSignalsFromMeasurements
 {
     private const SENSIBILITY_THRESHOLD = 1;
-    private const NOTICEABLE_CHANGES = 5;
-    private const VOLATILITY_THRESHOLD = 75;
+    private const NOTICEABLE_CHANGES    = 5;
+    private const VOLATILITY_THRESHOLD  = 75;
 
     private $prediction_service;
 
@@ -60,106 +60,74 @@ final class GetSignalsFromMeasurements
         $this->change_percentage_on_medium = $this->mid_term_measurements->priceChangePercent();
         $this->change_percentage_on_short  = $this->short_term_measurements->priceChangePercent();
 
-        $this->prediction_percentage_on_short = $this->prediction_service
-            ->predict($this->short_term_measurements)
-            ->priceChangePercent();
-
-        $this->prediction_percentage_on_medium = $this->prediction_service
-            ->predict($this->mid_term_measurements)
-            ->priceChangePercent();
-
-        $this->prediction_percentage_on_long = $this->prediction_service
-            ->predict($this->long_term_measurements)
-            ->priceChangePercent();
+        $this->prediction_percentage_on_short  = $this->prediction_service->predict($this->short_term_measurements)->priceChangePercent();
+        $this->prediction_percentage_on_medium = $this->prediction_service->predict($this->mid_term_measurements)->priceChangePercent();
+        $this->prediction_percentage_on_long   = $this->prediction_service->predict($this->long_term_measurements)->priceChangePercent();
 
         $this->setMaxMinAndDiff();
 
-        if ($this->long_term_measurements->priceChangePercent() > self::SENSIBILITY_THRESHOLD * 5)
-        {
+        if ($this->long_term_measurements->priceChangePercent() > self::SENSIBILITY_THRESHOLD * 5) {
             $this->addSignal(Signal::EXCELLENT('Earning ' . $this->long_term_measurements->priceChangePercent() . '% in this period.'));
-        }
-        else if ($this->long_term_measurements->priceChangePercent() > self::SENSIBILITY_THRESHOLD)
-        {
+        } elseif ($this->long_term_measurements->priceChangePercent() > self::SENSIBILITY_THRESHOLD) {
             $this->addSignal(Signal::GOOD('Earning ' . $this->long_term_measurements->priceChangePercent() . '% in this period.'));
         }
 
-        if ($this->long_term_measurements->priceChangePercent() < -self::SENSIBILITY_THRESHOLD * 5)
-        {
+        if ($this->long_term_measurements->priceChangePercent() < -self::SENSIBILITY_THRESHOLD * 5) {
             $this->addSignal(Signal::POOR('Loosing ' . $this->long_term_measurements->priceChangePercent() . '% in this period.'));
-        }
-        else if ($this->long_term_measurements->priceChangePercent() < -self::SENSIBILITY_THRESHOLD)
-        {
+        } elseif ($this->long_term_measurements->priceChangePercent() < -self::SENSIBILITY_THRESHOLD) {
             $this->addSignal(Signal::BAD('Loosing ' . $this->long_term_measurements->priceChangePercent() . '% in this period.'));
         }
 
-        if ($this->hasVeryPositivePrediction())
-        {
+        if ($this->hasVeryPositivePrediction()) {
             $this->addSignal(Signal::EXCELLENT('Positive prediction based in this period (' . $this->prediction_percentage_on_long . '%).'));
-        }
-        else if ($this->hasPositivePrediction())
-        {
+        } elseif ($this->hasPositivePrediction()) {
             $this->addSignal(Signal::GOOD('Positive prediction based in this period (' . $this->prediction_percentage_on_long . '%).'));
         }
 
-        if ($this->hasVeryNegativePrediction())
-        {
+        if ($this->hasVeryNegativePrediction()) {
             $this->addSignal(Signal::POOR('Negative prediction based in this period (' . $this->prediction_percentage_on_long . '%).'));
-        }
-        else if ($this->hasNegativePrediction())
-        {
+        } elseif ($this->hasNegativePrediction()) {
             $this->addSignal(Signal::BAD('Negative prediction based in this period (' . $this->prediction_percentage_on_long . '%).'));
         }
 
-        if ($this->hasLowVolatility())
-        {
+        if ($this->hasLowVolatility()) {
             $this->addSignal(Signal::NEUTRAL('Low volatility in this period (' . $this->max_change_percent . '%).'));
         }
 
-        if ($this->isPredictionProgressivelyBetter())
-        {
+        if ($this->isPredictionProgressivelyBetter()) {
             $this->addSignal(Signal::GOOD('Better predictions on short term measurements.'));
         }
 
-        if ($this->isPredictionProgressivelyWorse())
-        {
+        if ($this->isPredictionProgressivelyWorse()) {
             $this->addSignal(Signal::BAD('Worse predictions on short term measurements.'));
         }
 
-        if ($this->isAllPositive())
-        {
+        if ($this->isAllPositive()) {
             $this->addSignal(Signal::EXCELLENT('Earning in all date ranges.'));
         }
 
-        if ($this->isAllNegative())
-        {
+        if ($this->isAllNegative()) {
             $this->addSignal(Signal::POOR('Loosing in all date ranges.'));
         }
 
-        if ($this->isRecoveringOnShort())
-        {
+        if ($this->isRecoveringOnShort()) {
             $this->addSignal(Signal::GOOD('Recovering value in short term (' . $this->change_percentage_on_short . '%) after being in down tendency.'));
         }
 
-        if ($this->isLoosingOnShort())
-        {
+        if ($this->isLoosingOnShort()) {
             $this->addSignal(Signal::BAD('Loosing value in short term (' . $this->change_percentage_on_short . '%) after being in up tendency.'));
         }
 
-        if ($this->isNoticeableRecentImprovement())
-        {
+        if ($this->isNoticeableRecentImprovement()) {
             $this->addSignal(Signal::GOOD('Having a noticeable improvement recently (' . $this->change_percentage_on_short . '%).'));
         }
 
-        if ($this->isNoticeableRecentDecrease())
-        {
+        if ($this->isNoticeableRecentDecrease()) {
             $this->addSignal(Signal::BAD('Having a noticeable decrease recently (' . $this->change_percentage_on_short . '%).'));
         }
 
-        if ($this->isHighlyVolatile())
-        {
-            $this->addSignal(
-                Signal::NEUTRAL('High volatility during this period: Max increase: ' . $this->max_change_amount . '%, Max. decrease: ' . $this->min_change_amount . '%.')
-            );
+        if ($this->isHighlyVolatile()) {
+            $this->addSignal(Signal::NEUTRAL('High volatility during this period: Max increase: ' . $this->max_change_amount . '%, Max. decrease: ' . $this->min_change_amount . '%.'));
         }
 
         return $this->getAllSignals();
@@ -172,44 +140,32 @@ final class GetSignalsFromMeasurements
 
     private function isPredictionProgressivelyBetter(): bool
     {
-        return $this->prediction_percentage_on_medium > $this->prediction_percentage_on_long
-            && $this->prediction_percentage_on_short > $this->prediction_percentage_on_medium
-            && $this->diff_change_percent > self::SENSIBILITY_THRESHOLD;
+        return $this->prediction_percentage_on_medium > $this->prediction_percentage_on_long && $this->prediction_percentage_on_short > $this->prediction_percentage_on_medium && $this->diff_change_percent > self::SENSIBILITY_THRESHOLD;
     }
 
     private function isPredictionProgressivelyWorse(): bool
     {
-        return $this->prediction_percentage_on_medium < $this->prediction_percentage_on_long
-            && $this->prediction_percentage_on_short < $this->prediction_percentage_on_medium
-            && $this->diff_change_percent > self::SENSIBILITY_THRESHOLD;
+        return $this->prediction_percentage_on_medium < $this->prediction_percentage_on_long && $this->prediction_percentage_on_short < $this->prediction_percentage_on_medium && $this->diff_change_percent > self::SENSIBILITY_THRESHOLD;
     }
 
     private function isAllPositive(): bool
     {
-        return $this->change_percentage_on_long > self::SENSIBILITY_THRESHOLD
-            && $this->change_percentage_on_medium > self::SENSIBILITY_THRESHOLD
-            && $this->change_percentage_on_short > self::SENSIBILITY_THRESHOLD;
+        return $this->change_percentage_on_long > self::SENSIBILITY_THRESHOLD && $this->change_percentage_on_medium > self::SENSIBILITY_THRESHOLD && $this->change_percentage_on_short > self::SENSIBILITY_THRESHOLD;
     }
 
     private function isAllNegative(): bool
     {
-        return $this->change_percentage_on_long < -self::SENSIBILITY_THRESHOLD
-            && $this->change_percentage_on_medium < -self::SENSIBILITY_THRESHOLD
-            && $this->change_percentage_on_short < -self::SENSIBILITY_THRESHOLD;
+        return $this->change_percentage_on_long < -self::SENSIBILITY_THRESHOLD && $this->change_percentage_on_medium < -self::SENSIBILITY_THRESHOLD && $this->change_percentage_on_short < -self::SENSIBILITY_THRESHOLD;
     }
 
     private function isRecoveringOnShort(): bool
     {
-        return $this->change_percentage_on_short > self::SENSIBILITY_THRESHOLD
-            && $this->change_percentage_on_medium < 0
-            && $this->change_percentage_on_long < 0;
+        return $this->change_percentage_on_short > self::SENSIBILITY_THRESHOLD && $this->change_percentage_on_medium < 0 && $this->change_percentage_on_long < 0;
     }
 
     private function isLoosingOnShort(): bool
     {
-        return $this->change_percentage_on_short < -self::SENSIBILITY_THRESHOLD
-            && $this->change_percentage_on_medium > 0
-            && $this->change_percentage_on_long > 0;
+        return $this->change_percentage_on_short < -self::SENSIBILITY_THRESHOLD && $this->change_percentage_on_medium > 0 && $this->change_percentage_on_long > 0;
     }
 
     private function isNoticeableRecentImprovement(): bool
@@ -240,25 +196,20 @@ final class GetSignalsFromMeasurements
         $this->min_change_percent = null;
 
         /** @var \Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement $stock_stats */
-        foreach ($this->long_term_measurements as $stock_stats)
-        {
+        foreach ($this->long_term_measurements as $stock_stats) {
             $change         = $stock_stats->change();
             $change_percent = $stock_stats->changePercent();
 
-            if (null === $this->max_change_amount || $change > $this->max_change_amount)
-            {
+            if (null === $this->max_change_amount || $change > $this->max_change_amount) {
                 $this->max_change_amount = $change;
             }
-            if (null === $this->min_change_amount || $change < $this->min_change_amount)
-            {
+            if (null === $this->min_change_amount || $change < $this->min_change_amount) {
                 $this->min_change_amount = $change;
             }
-            if (null === $this->max_change_percent || $change_percent > $this->max_change_percent)
-            {
+            if (null === $this->max_change_percent || $change_percent > $this->max_change_percent) {
                 $this->max_change_percent = $change_percent;
             }
-            if (null === $this->min_change_percent || $change_percent < $this->min_change_percent)
-            {
+            if (null === $this->min_change_percent || $change_percent < $this->min_change_percent) {
                 $this->min_change_percent = $change_percent;
             }
         }
