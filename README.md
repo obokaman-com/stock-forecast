@@ -106,3 +106,5 @@ You can use this project to run a robo-advisor using Telegram. You'll find some 
 If you want to test with your own bot, you should add an environment variable called `TELEGRAM_BOT_TOKEN`, with your assigned token. More information about creating your own Telegram bot on https://core.telegram.org/bots 
 
 An example Telegram bot is running as @CryptoInsightsBot. You can test it at https://t.me/CryptoInsightsBot
+
+![Telegram bot](https://raw.githubusercontent.com/obokaman-com/stock-forecast/assets/telegram-bot.gif)
