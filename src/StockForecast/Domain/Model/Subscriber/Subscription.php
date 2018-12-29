@@ -15,8 +15,8 @@ class Subscription
     public function __construct(Subscriber $a_subscriber, Currency $currency, Stock $stock)
     {
         $this->subscriber = $a_subscriber;
-        $this->currency = $currency;
-        $this->stock    = $stock;
+        $this->currency   = $currency;
+        $this->stock      = $stock;
     }
 
     public function subscriber(): Subscriber

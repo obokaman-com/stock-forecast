@@ -96,8 +96,8 @@ class CheckSubscriptions extends Command
                 [$currency, $stock] = $pair;
 
                 $measurements = $this->stock_measurements_collector->getMeasurements(Currency::fromCode($currency),
-                                                                                     Stock::fromCode($stock),
-                                                                                     Interval::fromStringDateInterval('minutes'));
+                    Stock::fromCode($stock),
+                    Interval::fromStringDateInterval('minutes'));
 
                 $signals = $this->get_signals_service->getSignals($measurements);
 
@@ -114,18 +114,18 @@ class CheckSubscriptions extends Command
                 $message .= 'Now selling at *' . $measurements->end()->close() . ' ' . $currency . '*';
 
                 $this->bot->sendMessage($telegram_message_id,
-                                        $message,
-                                        'Markdown',
-                                        false,
-                                        null,
-                                        new InlineKeyboardMarkup([
-                                                                     [
-                                                                         [
-                                                                             'text' => 'View ' . $currency . '-' . $stock . ' chart online',
-                                                                             'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($stock) . '/charts/' . strtolower($currency)
-                                                                         ]
-                                                                     ]
-                                                                 ]));
+                    $message,
+                    'Markdown',
+                    false,
+                    null,
+                    new InlineKeyboardMarkup([
+                        [
+                            [
+                                'text' => 'View ' . $currency . '-' . $stock . ' chart online',
+                                'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($stock) . '/charts/' . strtolower($currency)
+                            ]
+                        ]
+                    ]));
             } catch (\Exception $e) {
                 $this->output->writeln('There was an error: [' . \get_class($e) . '] ' . $e->getMessage());
             }

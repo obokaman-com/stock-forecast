@@ -46,9 +46,9 @@ class Webhook
             $bot->run();
         } catch (\Exception $e) {
             return new JsonResponse([
-                                        'error'   => \get_class($e),
-                                        'message' => $e->getMessage()
-                                    ]);
+                'error'   => \get_class($e),
+                'message' => $e->getMessage()
+            ]);
         }
 
         return new JsonResponse([]);
@@ -61,8 +61,8 @@ class Webhook
         string $stock
     ): string {
         $measurements = $this->stock_measurement_collector->getMeasurements(Currency::fromCode($currency),
-                                                                            Stock::fromCode($stock),
-                                                                            Interval::fromStringDateInterval($interval_unit));
+            Stock::fromCode($stock),
+            Interval::fromStringDateInterval($interval_unit));
 
         $signals_response = $this->get_signals_service->getSignals($measurements);
 

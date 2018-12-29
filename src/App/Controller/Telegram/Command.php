@@ -98,24 +98,24 @@ MARKDOWN;
                 $chat_id = $message->getChat()->getId();
 
                 $bot->sendMessage($chat_id,
-                    'Ok, I will contact you when relevant changes happen to your chosen pair.',
+                    'Ok, choose an option:',
                     null,
                     false,
                     null,
                     new InlineKeyboardMarkup([
                         [
                             [
-                                'text'          => 'USD',
+                                'text'          => 'Add subscription ▶︎',
                                 'callback_data' => json_encode([
-                                    'method'   => 'subscribe_ask_stock',
-                                    'currency' => 'USD'
+                                    'method' => 'subscribe_add'
                                 ])
-                            ],
+                            ]
+                        ],
+                        [
                             [
-                                'text'          => 'EUR',
+                                'text'          => 'Manage subscriptions ▶︎',
                                 'callback_data' => json_encode([
-                                    'method'   => 'subscribe_ask_stock',
-                                    'currency' => 'EUR'
+                                    'method' => 'subscribe_manage'
                                 ])
                             ]
                         ]

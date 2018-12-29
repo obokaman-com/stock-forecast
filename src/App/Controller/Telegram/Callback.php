@@ -28,56 +28,56 @@ final class Callback
             switch ($callback_data['method']) {
                 case 'insights_ask_stock':
                     $bot->editMessageText($callback_query->getMessage()->getChat()->getId(),
-                                          $callback_query->getMessage()->getMessageId(),
-                                          'Ok, now select the crypto:',
-                                          null,
-                                          false,
-                                          new InlineKeyboardMarkup([
-                                                                       [
-                                                                           [
-                                                                               'text'          => 'BTC',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'insights',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'BTC'
-                                                                                                              ])
-                                                                           ],
-                                                                           [
-                                                                               'text'          => 'BCH',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'insights',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'BCH'
-                                                                                                              ])
-                                                                           ],
-                                                                           [
-                                                                               'text'          => 'ETH',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'insights',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'ETH'
-                                                                                                              ])
-                                                                           ]
-                                                                       ],
-                                                                       [
-                                                                           [
-                                                                               'text'          => 'XRP',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'insights',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'XRP'
-                                                                                                              ])
-                                                                           ],
-                                                                           [
-                                                                               'text'          => 'LTC',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'insights',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'LTC'
-                                                                                                              ])
-                                                                           ],
-                                                                       ]
-                                                                   ]));
+                        $callback_query->getMessage()->getMessageId(),
+                        'Ok, now select the crypto:',
+                        null,
+                        false,
+                        new InlineKeyboardMarkup([
+                            [
+                                [
+                                    'text'          => 'BTC',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'insights',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'BTC'
+                                    ])
+                                ],
+                                [
+                                    'text'          => 'BCH',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'insights',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'BCH'
+                                    ])
+                                ],
+                                [
+                                    'text'          => 'ETH',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'insights',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'ETH'
+                                    ])
+                                ]
+                            ],
+                            [
+                                [
+                                    'text'          => 'XRP',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'insights',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'XRP'
+                                    ])
+                                ],
+                                [
+                                    'text'          => 'LTC',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'insights',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'LTC'
+                                    ])
+                                ],
+                            ]
+                        ]));
                     break;
 
                 case 'insights':
@@ -86,9 +86,9 @@ final class Callback
                     $crypto        = $callback_data['crypto'];
 
                     $bot->editMessageText($callback_query->getMessage()->getChat()->getId(),
-                                          $callback_query->getMessage()->getMessageId(),
-                                          sprintf('I\'ll give you some insights for *%s-%s*:', $currency, $crypto),
-                                          'Markdown');
+                        $callback_query->getMessage()->getMessageId(),
+                        sprintf('I\'ll give you some insights for *%s-%s*:', $currency, $crypto),
+                        'Markdown');
 
                     try {
                         $signals_message = $webhook->outputSignalsBasedOn('hour', Interval::MINUTES, $currency, $crypto);
@@ -96,18 +96,18 @@ final class Callback
                         $signals_message .= $webhook->outputSignalsBasedOn('month', Interval::DAYS, $currency, $crypto);
 
                         $bot->sendMessage($callback_query->getMessage()->getChat()->getId(),
-                                          $signals_message,
-                                          'Markdown',
-                                          false,
-                                          null,
-                                          new InlineKeyboardMarkup([
-                                                                       [
-                                                                           [
-                                                                               'text' => 'View ' . $currency . '-' . $crypto . ' chart online',
-                                                                               'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($crypto) . '/charts/' . strtolower($currency)
-                                                                           ]
-                                                                       ]
-                                                                   ]));
+                            $signals_message,
+                            'Markdown',
+                            false,
+                            null,
+                            new InlineKeyboardMarkup([
+                                [
+                                    [
+                                        'text' => 'View ' . $currency . '-' . $crypto . ' chart online',
+                                        'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($crypto) . '/charts/' . strtolower($currency)
+                                    ]
+                                ]
+                            ]));
                     } catch (TelegramException $e) {
                         throw $e;
                     } catch (\Exception $e) {
@@ -116,58 +116,84 @@ final class Callback
 
                     break;
 
+                case 'subscribe_add':
+                    $bot->editMessageText($callback_query->getMessage()->getChat()->getId(),
+                        $callback_query->getMessage()->getMessageId(),
+                        'Ok, now select the currency:',
+                        null,
+                        false,
+                        new InlineKeyboardMarkup([
+                            [
+                                [
+                                    'text'          => 'USD',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'subscribe_ask_stock',
+                                        'currency' => 'USD'
+                                    ])
+                                ],
+                                [
+                                    'text'          => 'EUR',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'subscribe_ask_stock',
+                                        'currency' => 'EUR'
+                                    ])
+                                ]
+                            ]
+                        ]));
+                    break;
+
                 case 'subscribe_ask_stock':
                     $bot->editMessageText($callback_query->getMessage()->getChat()->getId(),
-                                          $callback_query->getMessage()->getMessageId(),
-                                          'Ok, now select the crypto:',
-                                          null,
-                                          false,
-                                          new InlineKeyboardMarkup([
-                                                                       [
-                                                                           [
-                                                                               'text'          => 'BTC',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'subscribe',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'BTC'
-                                                                                                              ])
-                                                                           ],
-                                                                           [
-                                                                               'text'          => 'BCH',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'subscribe',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'BCH'
-                                                                                                              ])
-                                                                           ],
-                                                                           [
-                                                                               'text'          => 'ETH',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'subscribe',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'ETH'
-                                                                                                              ])
-                                                                           ]
-                                                                       ],
-                                                                       [
-                                                                           [
-                                                                               'text'          => 'XRP',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'subscribe',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'XRP'
-                                                                                                              ])
-                                                                           ],
-                                                                           [
-                                                                               'text'          => 'LTC',
-                                                                               'callback_data' => json_encode([
-                                                                                                                  'method'   => 'subscribe',
-                                                                                                                  'currency' => $callback_data['currency'],
-                                                                                                                  'crypto'   => 'LTC'
-                                                                                                              ])
-                                                                           ],
-                                                                       ]
-                                                                   ]));
+                        $callback_query->getMessage()->getMessageId(),
+                        'Ok, now select the crypto:',
+                        null,
+                        false,
+                        new InlineKeyboardMarkup([
+                            [
+                                [
+                                    'text'          => 'BTC',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'subscribe',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'BTC'
+                                    ])
+                                ],
+                                [
+                                    'text'          => 'BCH',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'subscribe',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'BCH'
+                                    ])
+                                ],
+                                [
+                                    'text'          => 'ETH',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'subscribe',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'ETH'
+                                    ])
+                                ]
+                            ],
+                            [
+                                [
+                                    'text'          => 'XRP',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'subscribe',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'XRP'
+                                    ])
+                                ],
+                                [
+                                    'text'          => 'LTC',
+                                    'callback_data' => json_encode([
+                                        'method'   => 'subscribe',
+                                        'currency' => $callback_data['currency'],
+                                        'crypto'   => 'LTC'
+                                    ])
+                                ],
+                            ]
+                        ]));
                     break;
 
                 case 'subscribe':
@@ -181,10 +207,10 @@ final class Callback
                     $subscriber = $webhook->subscriberRepo()->findByChatId($chat_id);
                     if (null === $subscriber) {
                         $subscriber = Subscriber::create($chat_id,
-                                                         $callback_query->getFrom()->getUsername(),
-                                                         $callback_query->getFrom()->getFirstName(),
-                                                         $callback_query->getFrom()->getLastName(),
-                                                         $callback_query->getFrom()->getLanguageCode()
+                            $callback_query->getFrom()->getUsername(),
+                            $callback_query->getFrom()->getFirstName(),
+                            $callback_query->getFrom()->getLastName(),
+                            $callback_query->getFrom()->getLanguageCode()
                         );
                     }
 
@@ -199,9 +225,9 @@ final class Callback
                     }
 
                     $bot->editMessageText($message->getChat()->getId(),
-                                          $message->getMessageId(),
-                                          $response,
-                                          'Markdown');
+                        $message->getMessageId(),
+                        $response,
+                        'Markdown');
                     break;
             }
         });

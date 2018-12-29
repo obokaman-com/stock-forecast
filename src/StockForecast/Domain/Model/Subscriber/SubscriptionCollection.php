@@ -21,6 +21,6 @@ class SubscriptionCollection extends Collection
      */
     protected function getKey($item): string
     {
-        return $item->currency() .'-' . $item->stock();
+        return $item->currency() . '-' . $item->stock();
     }
 }

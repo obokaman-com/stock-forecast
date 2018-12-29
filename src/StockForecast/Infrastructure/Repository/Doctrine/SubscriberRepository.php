@@ -39,8 +39,7 @@ class SubscriberRepository implements SubscriberRepositoryContract
     {
         $subscriber = $this->repo->findBy(['chat_id' => $a_chat_id->id()]);
 
-        if (empty($subscriber))
-        {
+        if (empty($subscriber)) {
             return null;
         }
 

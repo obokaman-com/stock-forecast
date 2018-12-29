@@ -86,16 +86,16 @@ final class Signals extends Command
     {
         $table = new Table($this->output);
         $table->setHeaders([
-                               'Date interval',
-                               'Open',
-                               'Close',
-                               'Change',
-                               'Change (%)',
-                               'High',
-                               'Low',
-                               'Volatility',
-                               'Volume'
-                           ]);
+            'Date interval',
+            'Open',
+            'Close',
+            'Change',
+            'Change (%)',
+            'High',
+            'Low',
+            'Volatility',
+            'Volume'
+        ]);
 
         $this->addTableRow($table, 'Short term', $stock_stats[0]);
         $this->addTableRow($table, 'Medium term', $stock_stats[1]);
@@ -107,16 +107,16 @@ final class Signals extends Command
     private function addTableRow(Table $table, string $label, Measurement $stats): void
     {
         $table->addRow([
-                           $label,
-                           $stats->open(),
-                           $stats->close(),
-                           $stats->change(),
-                           $stats->changePercent() . '%',
-                           $stats->high(),
-                           $stats->low(),
-                           $stats->volatility(),
-                           $stats->volume()
-                       ]);
+            $label,
+            $stats->open(),
+            $stats->close(),
+            $stats->change(),
+            $stats->changePercent() . '%',
+            $stats->high(),
+            $stats->low(),
+            $stats->volatility(),
+            $stats->volume()
+        ]);
     }
 
     private function outputSignalsBasedOn(
@@ -131,12 +131,12 @@ final class Signals extends Command
         $signals = $this->get_signals_service->getSignals($prediction_response->realMeasurements());
 
         $this->output->writeln('<options=bold>Signals based on last ' . $interval . ' (Score: ' . CalculateScore::calculate(...
-                                   $signals) . '):</>');
+                $signals) . '):</>');
 
         if ($this->input->getOption('table_output')) {
             $this->outputForecastTable($prediction_response->shortTermPredictions(),
-                                       $prediction_response->mediumTermPredictions(),
-                                       $prediction_response->longTermPredictions());
+                $prediction_response->mediumTermPredictions(),
+                $prediction_response->longTermPredictions());
         }
 
         foreach ($signals as $signal) {
