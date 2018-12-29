@@ -157,6 +157,14 @@ final class Callback
                             ]
                         ];
                     }
+                    $buttons[] = [
+                        [
+                            'text'          => '« Cancel',
+                            'callback_data' => json_encode([
+                                'method' => 'subscribe_cancel'
+                            ])
+                        ]
+                    ];
                     $bot->editMessageText($chat_id,
                         $callback_query->getMessage()->getMessageId(),
                         'Ok, select what currency-crypto pair you want to stop receiving alerts from:',
@@ -164,6 +172,25 @@ final class Callback
                         false,
                         new InlineKeyboardMarkup($buttons)
                     );
+                    break;
+
+                case 'subscribe_cancel':
+                    $chat_id = $callback_query->getMessage()->getChat()->getId();
+
+                    $subscriber = $webhook->subscriberRepo()->findByChatId(new ChatId($chat_id));
+                    if ($subscriber === null) {
+                        throw new SubscriberExistsException("It doesn't exist any user with chat id {$chat_id}");
+                    }
+
+                    $response = "👍 Ok, you'll keep receiving short-term signals of:";
+                    foreach ($subscriber->subscriptions() as $subscription) {
+                        $response .= PHP_EOL . '✅ *' . $subscription->currency() . '-' . $subscription->stock() . '*';
+                    }
+
+                    $bot->editMessageText($chat_id,
+                        $callback_query->getMessage()->getMessageId(),
+                        $response,
+                        'Markdown');
                     break;
 
                 case 'subscribe_remove':
@@ -179,10 +206,15 @@ final class Callback
                     $subscriber->unsubscribeFrom(Currency::fromCode($currency), Stock::fromCode($crypto));
                     $webhook->subscriberRepo()->persist($subscriber)->flush();
 
+                    $response = "👍 Ok, now you'll only keep receiving short-term signals of:";
+                    foreach ($subscriber->subscriptions() as $subscription) {
+                        $response .= PHP_EOL . '✅ *' . $subscription->currency() . '-' . $subscription->stock() . '*';
+                    }
+
                     $bot->editMessageText($chat_id,
                         $callback_query->getMessage()->getMessageId(),
-                        "👍 Ok, you'll stop receiving alerts from {$currency}-{$crypto}."
-                    );
+                        $response,
+                        'Markdown');
                     break;
 
                 case 'subscribe_ask_stock':
@@ -253,7 +285,7 @@ final class Callback
 
                     $webhook->subscriberRepo()->persist($subscriber)->flush();
 
-                    $response = 'Ok, you\'re now subscribed to short-term signals of:';
+                    $response = '👍 Ok, you\'re now subscribed to short-term signals of:';
                     foreach ($subscriber->subscriptions() as $subscription) {
                         $response .= PHP_EOL . '✅ *' . $subscription->currency() . '-' . $subscription->stock() . '*';
                     }
