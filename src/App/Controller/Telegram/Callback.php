@@ -148,11 +148,11 @@ final class Callback
                     foreach ($subscriber->subscriptions() as $subscription) {
                         $buttons[] = [
                             [
-                                'text'          => '❌ *' . $subscription->currency() . '-' . $subscription->stock() . '*',
+                                'text'          => '❌ ' . $subscription->currency() . '-' . $subscription->stock(),
                                 'callback_data' => json_encode([
                                     'method'   => 'subscribe_remove',
-                                    'currency' => $subscription->currency(),
-                                    'crypto'   => $subscription->stock()
+                                    'currency' => (string)$subscription->currency(),
+                                    'crypto'   => (string)$subscription->stock()
                                 ])
                             ]
                         ];
@@ -162,7 +162,7 @@ final class Callback
                         'Ok, select what currency-crypto pair you want to stop receiving alerts from:',
                         null,
                         false,
-                        new InlineKeyboardMarkup([$buttons])
+                        new InlineKeyboardMarkup($buttons)
                     );
                     break;
 
