@@ -101,10 +101,14 @@ There is a `forecast:test` command too that allow you to test different predicit
 
 #### Telegram bot (@CryptoInsightsBot)
 
-You can use this project to run a robo-advisor using Telegram. You'll find some commands and callbacks implemented under `App/Controller/Telegram`. 
+You can use this project to run a robo-advisor using Telegram. You'll find some commands and callbacks implemented under `App/Controller/Telegram` 
 
 If you want to test with your own bot, you should add an environment variable called `TELEGRAM_BOT_TOKEN`, with your assigned token. More information about creating your own Telegram bot on https://core.telegram.org/bots 
 
 An example Telegram bot is running as @CryptoInsightsBot. You can test it at https://t.me/CryptoInsightsBot
+
+It implements two simple commands: 
+* `/insights`: allow you to view signals for choosen currency - crypto pair
+* `/subscribe`: allow you to receive real-time alerts with relevant signals for choosen currency - crypto pair signal.
 
 ![Telegram bot](https://raw.githubusercontent.com/obokaman-com/stock-forecast/assets/telegram-bot.gif)
