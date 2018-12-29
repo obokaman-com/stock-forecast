@@ -7,6 +7,7 @@ use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
 use Obokaman\StockForecast\Domain\Model\Subscriber\ChatId;
 use Obokaman\StockForecast\Domain\Model\Subscriber\Subscriber;
+use Obokaman\StockForecast\Domain\Model\Subscriber\SubscriberExistsException;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client as TelegramClient;
 use TelegramBot\Api\Exception as TelegramException;
@@ -40,14 +41,6 @@ final class Callback
                                         'method'   => 'insights',
                                         'currency' => $callback_data['currency'],
                                         'crypto'   => 'BTC'
-                                    ])
-                                ],
-                                [
-                                    'text'          => 'BCH',
-                                    'callback_data' => json_encode([
-                                        'method'   => 'insights',
-                                        'currency' => $callback_data['currency'],
-                                        'crypto'   => 'BCH'
                                     ])
                                 ],
                                 [
@@ -103,7 +96,7 @@ final class Callback
                             new InlineKeyboardMarkup([
                                 [
                                     [
-                                        'text' => 'View ' . $currency . '-' . $crypto . ' chart online',
+                                        'text' => '📈 View ' . $currency . '-' . $crypto . ' chart online »',
                                         'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($crypto) . '/charts/' . strtolower($currency)
                                     ]
                                 ]
@@ -142,6 +135,56 @@ final class Callback
                         ]));
                     break;
 
+                case 'subscribe_manage':
+                    $chat_id    = $callback_query->getMessage()->getChat()->getId();
+                    $subscriber = $webhook->subscriberRepo()->findByChatId(new ChatId($chat_id));
+                    if ($subscriber === null) {
+                        throw new SubscriberExistsException("It doesn't exist any user with chat id {$chat_id}");
+                    }
+                    if (empty($subscriber->subscriptions())) {
+                        return;
+                    }
+                    $buttons = [];
+                    foreach ($subscriber->subscriptions() as $subscription) {
+                        $buttons[] = [
+                            [
+                                'text'          => '❌ *' . $subscription->currency() . '-' . $subscription->stock() . '*',
+                                'callback_data' => json_encode([
+                                    'method'   => 'subscribe_remove',
+                                    'currency' => $subscription->currency(),
+                                    'crypto'   => $subscription->stock()
+                                ])
+                            ]
+                        ];
+                    }
+                    $bot->editMessageText($chat_id,
+                        $callback_query->getMessage()->getMessageId(),
+                        'Ok, select what currency-crypto pair you want to stop receiving alerts from:',
+                        null,
+                        false,
+                        new InlineKeyboardMarkup([$buttons])
+                    );
+                    break;
+
+                case 'subscribe_remove':
+                    $callback_data = @json_decode($callback_query->getData(), true) ?: ['method' => 'empty'];
+                    $currency      = $callback_data['currency'];
+                    $crypto        = $callback_data['crypto'];
+
+                    $chat_id    = $callback_query->getMessage()->getChat()->getId();
+                    $subscriber = $webhook->subscriberRepo()->findByChatId(new ChatId($chat_id));
+                    if ($subscriber === null) {
+                        throw new SubscriberExistsException("It doesn't exist any user with chat id {$chat_id}");
+                    }
+                    $subscriber->unsubscribeFrom(Currency::fromCode($currency), Stock::fromCode($crypto));
+                    $webhook->subscriberRepo()->persist($subscriber)->flush();
+
+                    $bot->editMessageText($chat_id,
+                        $callback_query->getMessage()->getMessageId(),
+                        "👍 Ok, you'll stop receiving alerts from {$currency}-{$crypto}."
+                    );
+                    break;
+
                 case 'subscribe_ask_stock':
                     $bot->editMessageText($callback_query->getMessage()->getChat()->getId(),
                         $callback_query->getMessage()->getMessageId(),
@@ -156,14 +199,6 @@ final class Callback
                                         'method'   => 'subscribe',
                                         'currency' => $callback_data['currency'],
                                         'crypto'   => 'BTC'
-                                    ])
-                                ],
-                                [
-                                    'text'          => 'BCH',
-                                    'callback_data' => json_encode([
-                                        'method'   => 'subscribe',
-                                        'currency' => $callback_data['currency'],
-                                        'crypto'   => 'BCH'
                                     ])
                                 ],
                                 [
@@ -216,8 +251,7 @@ final class Callback
 
                     $subscriber->subscribeTo(Currency::fromCode($currency), Stock::fromCode($crypto));
 
-                    $webhook->subscriberRepo()->persist($subscriber);
-                    $webhook->subscriberRepo()->flush();
+                    $webhook->subscriberRepo()->persist($subscriber)->flush();
 
                     $response = 'Ok, you\'re now subscribed to short-term signals of:';
                     foreach ($subscriber->subscriptions() as $subscription) {

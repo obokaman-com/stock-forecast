@@ -60,9 +60,11 @@ class Webhook
         string $currency,
         string $stock
     ): string {
-        $measurements = $this->stock_measurement_collector->getMeasurements(Currency::fromCode($currency),
+        $measurements = $this->stock_measurement_collector->getMeasurements(
+            Currency::fromCode($currency),
             Stock::fromCode($stock),
-            Interval::fromStringDateInterval($interval_unit));
+            Interval::fromStringDateInterval($interval_unit)
+        );
 
         $signals_response = $this->get_signals_service->getSignals($measurements);
 

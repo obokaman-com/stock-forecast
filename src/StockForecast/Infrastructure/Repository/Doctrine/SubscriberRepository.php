@@ -58,12 +58,12 @@ class SubscriberRepository implements SubscriberRepositoryContract
         return $subscribers;
     }
 
-    public function persist(Subscriber $a_subscriber): void
+    public function persist(Subscriber $a_subscriber): SubscriberRepositoryContract
     {
         $this->em->persist($a_subscriber);
     }
 
-    public function remove(SubscriberId $a_subscriber_id): void
+    public function remove(SubscriberId $a_subscriber_id): SubscriberRepositoryContract
     {
         $subscriber = $this->em->getReference(Subscriber::class, $a_subscriber_id->id());
         $this->em->remove($subscriber);

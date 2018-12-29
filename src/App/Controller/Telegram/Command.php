@@ -20,9 +20,9 @@ final class Command
         $bot->on(function (Update $an_update) use ($bot) {
             $a_message      = $an_update->getMessage();
             $answer_message = <<<MARKDOWN
-Sorry, currently I only understand a few commands.
+🤷‍♂️ Sorry, currently I only understand a few commands. 🙄
 
-Please, use /help to know available commands.
+ℹ️ Please, use /help to see available commands.
 MARKDOWN;
 
             $bot->sendMessage($a_message->getChat()->getId(), $answer_message, 'Markdown');
@@ -43,9 +43,9 @@ MARKDOWN;
         $bot->command('start',
             function (TelegramMessage $a_message) use ($bot) {
                 $welcome_message = <<<MARKDOWN
-Hey there. Welcome to Crypto Insights bot. You can use bot commands to get some insights, predictions and recommendations for your favorite cryptos.
+👋 Hey there. Welcome to Crypto Insights bot. You can use bot commands to get some insights, predictions and recommendations for your favorite cryptos, and subscribe to receive relevant alerts in real time. 
 
-Use /help to know available commands.
+ℹ️ Use /help to see available commands.
 MARKDOWN;
                 $bot->sendMessage($a_message->getChat()->getId(), $welcome_message, 'Markdown');
             });
@@ -54,8 +54,6 @@ MARKDOWN;
             function (TelegramMessage $a_message) use ($bot) {
                 $help_message = <<<MARKDOWN
 I can give you some forecast, analysis and insights using historical data and sentiment analysis from several sources.
-
-*Insights*
 
 /insights - Will ask you for a currency / crypto pair to give some insights based on last changes in the valuation.
 

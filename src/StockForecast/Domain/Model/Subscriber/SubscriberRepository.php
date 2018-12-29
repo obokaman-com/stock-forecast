@@ -11,9 +11,9 @@ interface SubscriberRepository
     /** @return Subscriber[] */
     public function findAll(): array;
 
-    public function persist(Subscriber $a_subscriber): void;
+    public function persist(Subscriber $a_subscriber): SubscriberRepository;
 
-    public function remove(SubscriberId $a_subscriber_id): void;
+    public function remove(SubscriberId $a_subscriber_id): SubscriberRepository;
 
     public function flush(): void;
 }
