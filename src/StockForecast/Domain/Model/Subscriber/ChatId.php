@@ -11,7 +11,7 @@ class ChatId
         $this->id = $id;
     }
 
-    public function id()
+    public function id(): string
     {
         return $this->id;
     }

@@ -33,4 +33,12 @@ services:
     Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Infrastructure\MachineLearning\PhpMl\LeastSquares'
     #Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Infrastructure\MachineLearning\PhpMl\SupportVectorRegression'
 
-
+    Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements:
+        arguments:
+            - '@Obokaman\StockForecast\Domain\Service\Predict\Predict'
+            - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByPriceChange'
+            - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByPrediction'
+            - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByPredictionEvolution'
+            - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByVolatility'
+            - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByConsistency'
+            - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByShortTermChanges'

@@ -45,7 +45,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
         $key = $this->getKey($item);
 
         if (!isset($this->all_items[$key])) {
-            throw new \RuntimeException('Item with key ' . $key . ' doesn\'t exist in ' . static::class);
+            throw new \RuntimeException("Item with key {$key} doesn't exist in " . static::class);
         }
 
         return $this->all_items[$key];
@@ -58,7 +58,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
         $key = $this->getKey($item);
 
         if (!isset($this->all_items[$key])) {
-            throw new \RuntimeException('Item with key ' . $key . ' doesn\'t exist in ' . static::class);
+            throw new \RuntimeException("Item with key {$key} doesn't exist in " . static::class);
         }
 
         unset($this->all_items[$key]);
