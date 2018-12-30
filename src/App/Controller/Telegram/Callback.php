@@ -182,7 +182,7 @@ final class Callback
                         throw new SubscriberExistsException("It doesn't exist any user with chat id {$chat_id}");
                     }
 
-                    $response = "👍 Ok, you'll keep receiving short-term signals of:";
+                    $response = "👍 Ok {$subscriber->visibleName()}, you'll keep receiving short-term signals of:";
                     foreach ($subscriber->subscriptions() as $subscription) {
                         $response .= PHP_EOL . '✅ *' . $subscription->currency() . '-' . $subscription->stock() . '*';
                     }
@@ -206,7 +206,7 @@ final class Callback
                     $subscriber->unsubscribeFrom(Currency::fromCode($currency), Stock::fromCode($crypto));
                     $webhook->subscriberRepo()->persist($subscriber)->flush();
 
-                    $response = "👍 Ok, now you'll only keep receiving short-term signals of:";
+                    $response = "👍 Ok {$subscriber->visibleName()}, now you'll only keep receiving short-term signals of:";
                     foreach ($subscriber->subscriptions() as $subscription) {
                         $response .= PHP_EOL . '✅ *' . $subscription->currency() . '-' . $subscription->stock() . '*';
                     }
@@ -285,7 +285,7 @@ final class Callback
 
                     $webhook->subscriberRepo()->persist($subscriber)->flush();
 
-                    $response = '👍 Ok, you\'re now subscribed to short-term signals of:';
+                    $response = "👍 Ok {$subscriber->visibleName()}, you're now subscribed to short-term signals of:";
                     foreach ($subscriber->subscriptions() as $subscription) {
                         $response .= PHP_EOL . '✅ *' . $subscription->currency() . '-' . $subscription->stock() . '*';
                     }

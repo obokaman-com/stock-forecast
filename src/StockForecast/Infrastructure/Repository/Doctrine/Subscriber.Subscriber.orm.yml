@@ -11,6 +11,7 @@ Obokaman\StockForecast\Domain\Model\Subscriber\Subscriber:
         username:
             type: string
             length: 255
+            nullable: true
         first_name:
             type: string
             length: 255

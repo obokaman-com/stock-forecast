@@ -23,7 +23,7 @@ class Subscriber
     public function __construct(
         SubscriberId $subscriberId,
         ChatId $chat_id,
-        string $username,
+        ?string $username,
         ?string $first_name,
         ?string $last_name,
         ?string $language,
@@ -38,7 +38,7 @@ class Subscriber
         $this->subscriptions = new ArrayCollection($subscriptions);
     }
 
-    public static function create(ChatId $chat_id, string $username, ?string $first_name, ?string $last_name, ?string $language): self
+    public static function create(ChatId $chat_id, ?string $username, ?string $first_name, ?string $last_name, ?string $language): self
     {
         return new self(SubscriberId::unique(), $chat_id, $username, $first_name, $last_name, $language, []);
     }
@@ -53,7 +53,7 @@ class Subscriber
         return $this->chat_id;
     }
 
-    public function username(): string
+    public function username(): ?string
     {
         return $this->username;
     }
@@ -61,6 +61,11 @@ class Subscriber
     public function firstName(): ?string
     {
         return $this->first_name;
+    }
+
+    public function visibleName(): string
+    {
+        return $this->first_name ?? $this->username ?? 'Anonymous';
     }
 
     public function lastName(): ?string
