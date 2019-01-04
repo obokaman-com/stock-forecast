@@ -11,7 +11,6 @@ use TelegramBot\Api\Types\Update;
 
 final class Command
 {
-    /** @var Client|BotApi */
     private $telegram_client;
 
     /** @var BaseCommand[] */
@@ -33,10 +32,11 @@ final class Command
     {
         $bot = $this->telegram_client;
 
-        $bot->on(
+        $this->telegram_client->on(
             function (Update $an_update) use ($bot) {
                 $answer_message = (new OpenTextInterpreter())->answer($an_update);
 
+                /** @var BotApi $bot */
                 $bot->sendMessage($an_update->getMessage()->getChat()->getId(), $answer_message, 'Markdown');
             },
             function (Update $an_update) {
