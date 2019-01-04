@@ -42,3 +42,27 @@ services:
             - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByVolatility'
             - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByConsistency'
             - '@Obokaman\StockForecast\Domain\Service\Signal\Extract\ByShortTermChanges'
+
+    TelegramBot\Api\Client:
+        arguments:
+            - '%env(resolve:TELEGRAM_BOT_TOKEN)%'
+
+    App\Controller\Telegram\Command:
+        arguments:
+            - '@TelegramBot\Api\Client'
+            - '@App\Controller\Telegram\Command\StartCommand'
+            - '@App\Controller\Telegram\Command\HelpCommand'
+            - '@App\Controller\Telegram\Command\InsightsCommand'
+            - '@App\Controller\Telegram\Command\SubscribeCommand'
+
+    App\Controller\Telegram\Callback:
+        arguments:
+            - '@TelegramBot\Api\Client'
+            - '@App\Controller\Telegram\Callback\InsightsAskStockCallback'
+            - '@App\Controller\Telegram\Callback\InsightsCallback'
+            - '@App\Controller\Telegram\Callback\SubscribeCallback'
+            - '@App\Controller\Telegram\Callback\SubscribeManageCallback'
+            - '@App\Controller\Telegram\Callback\SubscribeAddCallback'
+            - '@App\Controller\Telegram\Callback\SubscribeAskStock'
+            - '@App\Controller\Telegram\Callback\SubscribeRemoveCallback'
+            - '@App\Controller\Telegram\Callback\SubscribeCancelCallback'

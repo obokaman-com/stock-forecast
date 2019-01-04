@@ -2,32 +2,24 @@
 
 namespace App\Controller\Telegram;
 
-use Obokaman\StockForecast\Domain\Model\Date\Interval;
-use Obokaman\StockForecast\Domain\Model\Financial\Currency;
-use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
-use Obokaman\StockForecast\Domain\Model\Subscriber\SubscriberRepository;
-use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
-use Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements;
-use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Collector;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use TelegramBot\Api\BotApi;
-use TelegramBot\Api\Client as TelegramClient;
+use TelegramBot\Api\Client;
 
 class Webhook
 {
-    private $stock_measurement_collector;
-    private $get_signals_service;
-    private $subscriber_repository;
+    private $telegram_client;
+    private $telegram_commands;
+    private $telegram_callbacks;
 
     public function __construct(
-        Collector $a_stock_measurement_collector,
-        GetSignalsFromMeasurements $a_get_signals_service,
-        SubscriberRepository $a_subscriber_repository
+        Client $a_telegram_client,
+        Command $some_telegram_commands,
+        Callback $some_telegram_callbacks
     ) {
-        $this->stock_measurement_collector = $a_stock_measurement_collector;
-        $this->get_signals_service         = $a_get_signals_service;
-        $this->subscriber_repository       = $a_subscriber_repository;
+        $this->telegram_client    = $a_telegram_client;
+        $this->telegram_commands  = $some_telegram_commands;
+        $this->telegram_callbacks = $some_telegram_callbacks;
     }
 
     public function index(string $token): JsonResponse
@@ -36,14 +28,12 @@ class Webhook
             throw new NotFoundHttpException();
         }
 
-        /** @var TelegramClient|BotApi $bot */
-        $bot = new TelegramClient($_SERVER['TELEGRAM_BOT_TOKEN']);
+        $this->logPostRequest();
 
         try {
-            Command::configure($bot);
-            Callback::configure($bot, $this);
-
-            $bot->run();
+            $this->telegram_commands->configure();
+            $this->telegram_callbacks->configure();
+            $this->telegram_client->run();
         } catch (\Exception $e) {
             return new JsonResponse([
                 'error'   => \get_class($e),
@@ -54,36 +44,12 @@ class Webhook
         return new JsonResponse([]);
     }
 
-    public function outputSignalsBasedOn(
-        string $interval,
-        string $interval_unit,
-        string $currency,
-        string $stock
-    ): string {
-        $measurements = $this->stock_measurement_collector->getMeasurements(
-            Currency::fromCode($currency),
-            Stock::fromCode($stock),
-            Interval::fromStringDateInterval($interval_unit)
-        );
-
-        $signals_response = $this->get_signals_service->getSignals($measurements);
-
-        $message = 'Based on *last ' . $interval . '* (Score: ' . CalculateScore::calculate(...
-                $signals_response) . '):' . PHP_EOL;
-
-        foreach ($signals_response as $signal) {
-            $message .= '_ - ' . $signal . '_' . PHP_EOL;
-        }
-
-        if (Interval::MINUTES === $interval_unit) {
-            $message = 'Last price: ' . $measurements->end()->close() . ' ' . $currency . PHP_EOL . $message;
-        }
-
-        return $message . PHP_EOL;
-    }
-
-    public function subscriberRepo(): SubscriberRepository
+    private function logPostRequest(): void
     {
-        return $this->subscriber_repository;
+        @file_put_contents(
+            __DIR__ . '/../../../../var/log/telegram_payload.json',
+            date('==Y-m-d H:i:s==') . PHP_EOL . @file_get_contents('php://input') . PHP_EOL . PHP_EOL,
+            FILE_APPEND
+        );
     }
 }
