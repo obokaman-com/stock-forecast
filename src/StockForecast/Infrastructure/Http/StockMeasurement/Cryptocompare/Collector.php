@@ -2,6 +2,7 @@
 
 namespace Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Cryptocompare;
 
+use DateTimeImmutable;
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Date\Period;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
@@ -10,6 +11,7 @@ use Obokaman\StockForecast\Domain\Model\Financial\Stock\MeasurementCollection;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
 use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\CollectException;
 use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Collector as CollectorContract;
+use UnexpectedValueException;
 
 class Collector implements CollectorContract
 {
@@ -20,16 +22,15 @@ class Collector implements CollectorContract
         Stock $a_stock,
         Interval $a_date_interval
     ): MeasurementCollection {
-        $api_method = $this->getApiMethodForInterval($a_date_interval);
-        $api_url    = sprintf(self::API_URL, $api_method, $a_stock, $a_currency, Period::getLong($a_date_interval) - 1);
-        $response   = $this->collectStockInformationFromRemoteApi($api_url);
+        $api_url = $this->getApiUrl($a_currency, $a_stock, $a_date_interval);
+        $response = $this->collectStockInformationFromRemoteApi($api_url);
 
         $stats_array = new MeasurementCollection();
 
         foreach ($response as $stats) {
             $stats_array->addItem(new Measurement($a_currency,
                 $a_stock,
-                (new \DateTimeImmutable())->setTimestamp($stats['time']),
+                (new DateTimeImmutable())->setTimestamp($stats['time']),
                 $stats['open'],
                 $stats['close'],
                 $stats['high'],
@@ -70,6 +71,19 @@ class Collector implements CollectorContract
             return 'histominute';
         }
 
-        throw new \UnexpectedValueException('Unknown given date interval: ' . $a_date_interval->interval());
+        throw new UnexpectedValueException('Unknown given date interval: ' . $a_date_interval->interval());
+    }
+
+    private function getApiUrl(Currency $a_currency, Stock $a_stock, Interval $a_date_interval): string
+    {
+        $api_method = $this->getApiMethodForInterval($a_date_interval);
+        $api_url = sprintf(self::API_URL, $api_method, $a_stock, $a_currency, Period::getLong($a_date_interval) - 1);
+        $cryptocompare_token = $_ENV['CRYPTOCOMPARE_TOKEN'] ?? null;
+
+        if ('YourCryptocompareToken' === $cryptocompare_token || null === $cryptocompare_token) {
+            return $api_url;
+        }
+
+        return $api_url . '&api_key=' . $cryptocompare_token;
     }
 }
