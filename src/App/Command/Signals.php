@@ -5,14 +5,11 @@ namespace App\Command;
 use Obokaman\StockForecast\Application\Service\PredictStockValue;
 use Obokaman\StockForecast\Application\Service\PredictStockValueRequest;
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
-use Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement;
 use Obokaman\StockForecast\Domain\Service\Signal\CalculateScore;
 use Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class Signals extends Command
@@ -46,8 +43,7 @@ final class Signals extends Command
              ->setDescription('Gives you some insights based on given crypto evolution in last days, hours and minutes.')
              ->setHelp('This command gives you some insights & signals for given currency/crypto pair.')
              ->addArgument('currency', InputArgument::OPTIONAL, 'The currency code.')
-             ->addArgument('stock', InputArgument::OPTIONAL, 'The stock code.')
-             ->addOption('table_output', 't', InputOption::VALUE_NONE, 'Should output forecast table?');
+             ->addArgument('stock', InputArgument::OPTIONAL, 'The stock code.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -82,47 +78,6 @@ final class Signals extends Command
         $this->output->writeln('');
     }
 
-    private function outputForecastTable(Measurement ...$stock_stats): void
-    {
-        $table = new Table($this->output);
-        $table->setHeaders(
-            [
-                'Date interval',
-                'Open',
-                'Close',
-                'Change',
-                'Change (%)',
-                'High',
-                'Low',
-                'Volatility',
-                'Volume'
-            ]
-        );
-
-        $this->addTableRow($table, 'Short term', $stock_stats[0]);
-        $this->addTableRow($table, 'Medium term', $stock_stats[1]);
-        $this->addTableRow($table, 'Long term', $stock_stats[2]);
-
-        $table->render();
-    }
-
-    private function addTableRow(Table $table, string $label, Measurement $stats): void
-    {
-        $table->addRow(
-            [
-                $label,
-                $stats->open(),
-                $stats->close(),
-                $stats->change(),
-                $stats->changePercent() . '%',
-                $stats->high(),
-                $stats->low(),
-                $stats->volatility(),
-                $stats->volume()
-            ]
-        );
-    }
-
     private function outputSignalsBasedOn(
         string $interval,
         string $interval_unit,
@@ -140,14 +95,6 @@ final class Signals extends Command
                 $signals
             ) . '):</>'
         );
-
-        if ($this->input->getOption('table_output')) {
-            $this->outputForecastTable(
-                $prediction_response->shortTermPredictions(),
-                $prediction_response->mediumTermPredictions(),
-                $prediction_response->longTermPredictions()
-            );
-        }
 
         foreach ($signals as $signal) {
             $this->output->writeln(' - <comment>' . $signal . '</comment>');
