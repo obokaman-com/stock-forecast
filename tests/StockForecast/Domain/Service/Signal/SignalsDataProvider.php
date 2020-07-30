@@ -1,6 +1,6 @@
 <?php
 
-namespace Obokaman\StocksForecast\Domain\Service\Signal;
+namespace Obokaman\StockForecast\Domain\Service\Signal;
 
 use DateTimeImmutable;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;

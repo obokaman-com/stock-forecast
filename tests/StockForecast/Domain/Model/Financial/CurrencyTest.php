@@ -3,9 +3,9 @@
 namespace Obokaman\StockForecast\Domain\Model\Financial;
 
 use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class CurrencyTest extends TestCase
+class CurrencyTest extends WebTestCase
 {
     /** @var Currency */
     private $currency;

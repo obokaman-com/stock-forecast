@@ -6,6 +6,8 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-###> phpunit/phpunit ###
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
 /phpunit.xml
-###< phpunit/phpunit ###
+###< symfony/phpunit-bridge ###

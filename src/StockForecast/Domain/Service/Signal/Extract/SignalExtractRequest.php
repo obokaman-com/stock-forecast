@@ -48,11 +48,14 @@ class SignalExtractRequest
 
     private function setMaxMinAndDiffPriceChanges(): void
     {
-        $this->max_change_amount = null;
-        $this->min_change_amount = null;
-        $this->max_change_percent = null;
-        $this->min_change_percent = null;
+        $this->setMinAndMaxChangeValues();
 
+        $this->diff_change_amount = $this->max_change_amount - $this->min_change_amount;
+        $this->diff_change_percent = $this->max_change_percent - $this->min_change_percent;
+    }
+
+    private function setMinAndMaxChangeValues(): void
+    {
         /** @var Measurement $stock_stats */
         foreach ($this->long_term_measurements as $stock_stats) {
             $change = $stock_stats->change();
@@ -71,8 +74,5 @@ class SignalExtractRequest
                 $this->min_change_percent = $change_percent;
             }
         }
-
-        $this->diff_change_amount = $this->max_change_amount - $this->min_change_amount;
-        $this->diff_change_percent = $this->max_change_percent - $this->min_change_percent;
     }
 }

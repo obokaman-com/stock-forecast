@@ -1,15 +1,14 @@
 <?php
 
-namespace Obokaman\StockForecast\Infrastructure\Http\StocksMeasurement\Cryptocompare;
+namespace Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Cryptocompare;
 
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
-use Obokaman\StockForecast\Infrastructure\Http\StockMeasurement\Cryptocompare\Collector;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class CollectorTest extends TestCase
+class CollectorTest extends WebTestCase
 {
     private $collector;
     private $stock_stats_array;

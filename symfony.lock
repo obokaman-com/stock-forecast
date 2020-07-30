@@ -65,9 +65,6 @@
     "doctrine/sql-formatter": {
         "version": "1.1.0"
     },
-    "myclabs/deep-copy": {
-        "version": "1.7.0"
-    },
     "ocramius/package-versions": {
         "version": "1.3.0"
     },
@@ -77,56 +74,11 @@
     "paragonie/random_compat": {
         "version": "v9.99.99"
     },
-    "phar-io/manifest": {
-        "version": "1.0.1"
-    },
-    "phar-io/version": {
-        "version": "1.0.1"
-    },
     "php": {
         "version": "7.2"
     },
     "php-ai/php-ml": {
         "version": "0.5.0"
-    },
-    "phpdocumentor/reflection-common": {
-        "version": "1.0.1"
-    },
-    "phpdocumentor/reflection-docblock": {
-        "version": "4.2.0"
-    },
-    "phpdocumentor/type-resolver": {
-        "version": "0.4.0"
-    },
-    "phpspec/prophecy": {
-        "version": "1.7.3"
-    },
-    "phpunit/php-code-coverage": {
-        "version": "5.3.0"
-    },
-    "phpunit/php-file-iterator": {
-        "version": "1.4.5"
-    },
-    "phpunit/php-text-template": {
-        "version": "1.2.1"
-    },
-    "phpunit/php-timer": {
-        "version": "1.0.9"
-    },
-    "phpunit/php-token-stream": {
-        "version": "2.0.2"
-    },
-    "phpunit/phpunit": {
-        "version": "4.7",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "4.7",
-            "ref": "fc35828893288f0bb786291377433ee8d7e14738"
-        }
-    },
-    "phpunit/phpunit-mock-objects": {
-        "version": "5.0.5"
     },
     "psr/cache": {
         "version": "1.0.1"
@@ -143,38 +95,8 @@
     "ramsey/uuid": {
         "version": "3.8.0"
     },
-    "sebastian/code-unit-reverse-lookup": {
-        "version": "1.0.1"
-    },
-    "sebastian/comparator": {
-        "version": "2.1.0"
-    },
-    "sebastian/diff": {
-        "version": "2.0.1"
-    },
-    "sebastian/environment": {
-        "version": "3.1.0"
-    },
-    "sebastian/exporter": {
-        "version": "3.1.0"
-    },
-    "sebastian/global-state": {
-        "version": "2.0.0"
-    },
-    "sebastian/object-enumerator": {
-        "version": "3.0.3"
-    },
-    "sebastian/object-reflector": {
-        "version": "1.1.1"
-    },
-    "sebastian/recursion-context": {
-        "version": "3.0.0"
-    },
-    "sebastian/resource-operations": {
-        "version": "1.0.0"
-    },
-    "sebastian/version": {
-        "version": "2.0.1"
+    "symfony/browser-kit": {
+        "version": "v5.1.3"
     },
     "symfony/cache": {
         "version": "v4.0.2"
@@ -194,6 +116,9 @@
             "ref": "9f94d3ea453cd8a3b95db7f82592d7344fe3a76a"
         }
     },
+    "symfony/css-selector": {
+        "version": "v5.1.3"
+    },
     "symfony/dependency-injection": {
         "version": "v4.0.2"
     },
@@ -202,6 +127,9 @@
     },
     "symfony/doctrine-bridge": {
         "version": "v4.2.1"
+    },
+    "symfony/dom-crawler": {
+        "version": "v5.1.3"
     },
     "symfony/dotenv": {
         "version": "v4.2.1"
@@ -248,6 +176,21 @@
     "symfony/orm-pack": {
         "version": "v1.0.5"
     },
+    "symfony/phpunit-bridge": {
+        "version": "4.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.3",
+            "ref": "6d0e35f749d5f4bfe1f011762875275cd3f9874f"
+        },
+        "files": [
+            ".env.test",
+            "bin/phpunit",
+            "phpunit.xml.dist",
+            "tests/bootstrap.php"
+        ]
+    },
     "symfony/polyfill-ctype": {
         "version": "v1.10.0"
     },
@@ -284,6 +227,9 @@
     "symfony/string": {
         "version": "v5.1.3"
     },
+    "symfony/test-pack": {
+        "version": "v1.0.6"
+    },
     "symfony/var-dumper": {
         "version": "v4.0.2"
     },
@@ -295,12 +241,6 @@
     },
     "telegram-bot/api": {
         "version": "v2.3.7"
-    },
-    "theseer/tokenizer": {
-        "version": "1.1.0"
-    },
-    "webmozart/assert": {
-        "version": "1.2.0"
     },
     "zendframework/zend-code": {
         "version": "3.3.1"

@@ -2,9 +2,9 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Financial\Stock;
 
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class StockTest extends TestCase
+class StockTest extends WebTestCase
 {
     /** @var Stock */
     private $stock;

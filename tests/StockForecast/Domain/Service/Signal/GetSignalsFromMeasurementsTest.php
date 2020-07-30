@@ -6,10 +6,9 @@ use Obokaman\StockForecast\Domain\Model\Financial\Signal;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\MeasurementCollection;
 use Obokaman\StockForecast\Domain\Service\Predict\Predict;
 use Obokaman\StockForecast\Infrastructure\MachineLearning\PhpMl\LeastSquares;
-use Obokaman\StocksForecast\Domain\Service\Signal\SignalsDataProvider;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class GetSignalsFromMeasurementsTest extends TestCase
+class GetSignalsFromMeasurementsTest extends WebTestCase
 {
     /**
      * @test
