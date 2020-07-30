@@ -2,9 +2,14 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Financial\Stock;
 
+use DateInterval;
+use InvalidArgumentException;
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Date\Period;
 use Obokaman\StockForecast\Domain\Model\Kernel\Collection;
+
+use function array_slice;
+use function count;
 
 /**
  * @property Measurement[] $all_items
@@ -26,9 +31,9 @@ class MeasurementCollection extends Collection
         return (string)$item->timestamp()->getTimestamp();
     }
 
-    public function getIntervalBetweenMeasurements(): \DateInterval
+    public function getIntervalBetweenMeasurements(): DateInterval
     {
-        [$penultimate_stock_measurement, $last_stock_measurement] = \array_slice($this->all_items, -2, 2);
+        [$penultimate_stock_measurement, $last_stock_measurement] = array_slice($this->all_items, -2, 2);
 
         return $last_stock_measurement->timestamp()->diff($penultimate_stock_measurement->timestamp());
     }
@@ -36,18 +41,18 @@ class MeasurementCollection extends Collection
     public function filterByPeriod(string $a_period): MeasurementCollection
     {
         $interval = Interval::fromDateInterval($this->getIntervalBetweenMeasurements());
-        $period   = Period::getPeriod($interval, $a_period);
+        $period = Period::getPeriod($interval, $a_period);
 
         return $this->filterByQuantity($period);
     }
 
     public function filterByQuantity(int $quantity): MeasurementCollection
     {
-        if ($quantity > \count($this->all_items)) {
-            throw new \InvalidArgumentException('Trying to get more items than currently available.');
+        if ($quantity > count($this->all_items)) {
+            throw new InvalidArgumentException('Trying to get more items than currently available.');
         }
 
-        $items = \array_slice($this->all_items, -$quantity, $quantity);
+        $items = array_slice($this->all_items, -$quantity, $quantity);
 
         return new self($items);
     }
@@ -55,7 +60,7 @@ class MeasurementCollection extends Collection
     public function priceChangeAmount(): float
     {
         $first_measurement = reset($this->all_items);
-        $last_measurement  = end($this->all_items);
+        $last_measurement = end($this->all_items);
 
         return $last_measurement->close() - $first_measurement->close();
     }
@@ -63,7 +68,7 @@ class MeasurementCollection extends Collection
     public function priceChangePercent(): float
     {
         $first_measurement = reset($this->all_items);
-        $last_measurement  = end($this->all_items);
+        $last_measurement = end($this->all_items);
 
         return round((($last_measurement->close() - $first_measurement->close()) / abs($first_measurement->close())) * 100, 2);
     }

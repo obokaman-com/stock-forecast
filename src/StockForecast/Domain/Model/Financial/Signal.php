@@ -10,7 +10,7 @@ class Signal
     private function __construct(string $a_description, int $a_score)
     {
         $this->description = $a_description;
-        $this->score       = $a_score;
+        $this->score = $a_score;
     }
 
     public static function GOOD(string $a_description): Signal

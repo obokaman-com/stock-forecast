@@ -28,15 +28,19 @@ class Collector implements CollectorContract
         $stats_array = new MeasurementCollection();
 
         foreach ($response as $stats) {
-            $stats_array->addItem(new Measurement($a_currency,
-                $a_stock,
-                (new DateTimeImmutable())->setTimestamp($stats['time']),
-                $stats['open'],
-                $stats['close'],
-                $stats['high'],
-                $stats['low'],
-                $stats['volumefrom'],
-                $stats['volumeto']));
+            $stats_array->addItem(
+                new Measurement(
+                    $a_currency,
+                    $a_stock,
+                    (new DateTimeImmutable())->setTimestamp($stats['time']),
+                    $stats['open'],
+                    $stats['close'],
+                    $stats['high'],
+                    $stats['low'],
+                    $stats['volumefrom'],
+                    $stats['volumeto']
+                )
+            );
         }
 
         return $stats_array;

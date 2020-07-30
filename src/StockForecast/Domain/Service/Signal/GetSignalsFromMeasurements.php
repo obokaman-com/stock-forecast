@@ -12,21 +12,18 @@ use Obokaman\StockForecast\Domain\Service\Signal\Extract\SignalExtractRequest;
 final class GetSignalsFromMeasurements
 {
     public const SENSIBILITY_THRESHOLD = 1;
-    public const NOTICEABLE_CHANGES    = 5;
-    public const VOLATILITY_THRESHOLD  = 75;
-
+    public const NOTICEABLE_CHANGES = 5;
+    public const VOLATILITY_THRESHOLD = 75;
     private $prediction_service;
-
     /** @var Signal[] */
     private $signals;
-
     /** @var SignalExtract[] */
     private $extract_services;
 
-    public function __construct(Predict $a_prediction_service, SignalExtract ... $extract_services)
+    public function __construct(Predict $a_prediction_service, SignalExtract ...$extract_services)
     {
         $this->prediction_service = $a_prediction_service;
-        $this->extract_services   = $extract_services;
+        $this->extract_services = $extract_services;
     }
 
     /**
@@ -36,7 +33,7 @@ final class GetSignalsFromMeasurements
      */
     public function getSignals(MeasurementCollection $measurements): array
     {
-        $this->signals             = [];
+        $this->signals = [];
         $signal_extraction_request = $this->buildExtractRequest($measurements);
 
         foreach ($this->extract_services as $extract_service) {

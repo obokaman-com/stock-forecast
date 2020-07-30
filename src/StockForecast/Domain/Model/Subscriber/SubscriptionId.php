@@ -6,5 +6,4 @@ use Obokaman\StockForecast\Domain\Model\Kernel\AggregateId;
 
 class SubscriptionId extends AggregateId
 {
-
 }

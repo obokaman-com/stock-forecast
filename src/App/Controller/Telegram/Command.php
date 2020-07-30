@@ -12,13 +12,12 @@ use TelegramBot\Api\Types\Update;
 final class Command
 {
     private $telegram_client;
-
     /** @var BaseCommand[] */
     private $available_commands;
 
     public function __construct(Client $a_telegram_client, BaseCommand ...$telegram_commands)
     {
-        $this->telegram_client    = $a_telegram_client;
+        $this->telegram_client = $a_telegram_client;
         $this->available_commands = $telegram_commands;
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Controller\Telegram\Callback;
 
-
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
 use Obokaman\StockForecast\Domain\Model\Subscriber\ChatId;
@@ -29,15 +28,16 @@ class SubscribeCallback extends BaseCallback
     public function execute(CallbackQuery $a_callback): void
     {
         $callback_data = $this->getCallbackData($a_callback);
-        $currency      = $callback_data['currency'];
-        $crypto        = $callback_data['crypto'];
+        $currency = $callback_data['currency'];
+        $crypto = $callback_data['crypto'];
 
         $message = $a_callback->getMessage();
 
-        $chat_id    = new ChatId($message->getChat()->getId());
+        $chat_id = new ChatId($message->getChat()->getId());
         $subscriber = $this->subscriber_repository->findByChatId($chat_id);
         if (null === $subscriber) {
-            $subscriber = Subscriber::create($chat_id,
+            $subscriber = Subscriber::create(
+                $chat_id,
                 $a_callback->getFrom()->getUsername(),
                 $a_callback->getFrom()->getFirstName(),
                 $a_callback->getFrom()->getLastName(),
@@ -54,10 +54,11 @@ class SubscribeCallback extends BaseCallback
             $response .= PHP_EOL . '✅ *' . $subscription->currency() . '-' . $subscription->stock() . '*';
         }
 
-        $this->telegram_client->editMessageText($message->getChat()->getId(),
+        $this->telegram_client->editMessageText(
+            $message->getChat()->getId(),
             $message->getMessageId(),
             $response,
-            'Markdown');
+            'Markdown'
+        );
     }
-
 }

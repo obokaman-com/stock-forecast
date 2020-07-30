@@ -15,7 +15,7 @@ final class PredictStockValueRequest
     public function __construct(string $a_currency_code, string $a_stock_code, string $a_date_interval)
     {
         $this->currency_code = $a_currency_code;
-        $this->stock_code    = $a_stock_code;
+        $this->stock_code = $a_stock_code;
         $this->date_interval = $a_date_interval;
     }
 

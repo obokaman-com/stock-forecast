@@ -4,7 +4,6 @@ namespace App\Controller\Telegram\Command;
 
 use TelegramBot\Api\Types\Message as TelegramMessage;
 
-
 class HelpCommand extends BaseCommand
 {
     public function getCommand(): string

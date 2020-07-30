@@ -4,25 +4,22 @@ namespace Obokaman\StockForecast\Domain\Model\Date;
 
 class Period
 {
-    public const SHORT  = 'short';
+    public const SHORT = 'short';
     public const MEDIUM = 'medium';
-    public const LONG   = 'long';
-
+    public const LONG = 'long';
     private const SHORT_PERIOD = [
-        Interval::DAYS    => 7,
-        Interval::HOURS   => 6,
+        Interval::DAYS => 7,
+        Interval::HOURS => 6,
         Interval::MINUTES => 15
     ];
-
     private const MEDIUM_PERIOD = [
-        Interval::DAYS    => 15,
-        Interval::HOURS   => 12,
+        Interval::DAYS => 15,
+        Interval::HOURS => 12,
         Interval::MINUTES => 30
     ];
-
     private const LONG_PERIOD = [
-        Interval::DAYS    => 30,
-        Interval::HOURS   => 24,
+        Interval::DAYS => 30,
+        Interval::HOURS => 24,
         Interval::MINUTES => 60
     ];
 

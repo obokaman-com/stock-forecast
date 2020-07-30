@@ -2,6 +2,7 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Financial\Stock;
 
+use DateTimeImmutable;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +46,7 @@ class MeasurementTest extends TestCase
     public function statsSamplesProvider()
     {
         return [
-            [[Currency::fromCode('EUR'), Stock::fromCode('BTC'), new \DateTimeImmutable('now'), 10, 10, 10, 10, 10, 10]]
+            [[Currency::fromCode('EUR'), Stock::fromCode('BTC'), new DateTimeImmutable('now'), 10, 10, 10, 10, 10, 10]]
         ];
     }
 
@@ -53,7 +54,7 @@ class MeasurementTest extends TestCase
     {
         $this->assertInstanceOf(Currency::class, $this->measurement->currency());
         $this->assertInstanceOf(Stock::class, $this->measurement->stock());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $this->measurement->timestamp());
+        $this->assertInstanceOf(DateTimeImmutable::class, $this->measurement->timestamp());
         $this->assertInternalType('float', $this->measurement->open());
         $this->assertInternalType('float', $this->measurement->close());
         $this->assertInternalType('float', $this->measurement->change());

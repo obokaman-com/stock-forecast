@@ -2,7 +2,6 @@
 
 namespace Obokaman\StockForecast\Domain\Service\Signal\Extract;
 
-
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Measurement;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\MeasurementCollection;
 
@@ -35,28 +34,28 @@ class SignalExtractRequest
         float $prediction_percentage_on_medium,
         float $prediction_percentage_on_short
     ) {
-        $this->long_term_measurements          = $long_term_measurements;
-        $this->mid_term_measurements           = $mid_term_measurements;
-        $this->short_term_measurements         = $short_term_measurements;
-        $this->change_percentage_on_long       = $change_percentage_on_long;
-        $this->change_percentage_on_medium     = $change_percentage_on_medium;
-        $this->change_percentage_on_short      = $change_percentage_on_short;
-        $this->prediction_percentage_on_long   = $prediction_percentage_on_long;
+        $this->long_term_measurements = $long_term_measurements;
+        $this->mid_term_measurements = $mid_term_measurements;
+        $this->short_term_measurements = $short_term_measurements;
+        $this->change_percentage_on_long = $change_percentage_on_long;
+        $this->change_percentage_on_medium = $change_percentage_on_medium;
+        $this->change_percentage_on_short = $change_percentage_on_short;
+        $this->prediction_percentage_on_long = $prediction_percentage_on_long;
         $this->prediction_percentage_on_medium = $prediction_percentage_on_medium;
-        $this->prediction_percentage_on_short  = $prediction_percentage_on_short;
+        $this->prediction_percentage_on_short = $prediction_percentage_on_short;
         $this->setMaxMinAndDiffPriceChanges();
     }
 
     private function setMaxMinAndDiffPriceChanges(): void
     {
-        $this->max_change_amount  = null;
-        $this->min_change_amount  = null;
+        $this->max_change_amount = null;
+        $this->min_change_amount = null;
         $this->max_change_percent = null;
         $this->min_change_percent = null;
 
         /** @var Measurement $stock_stats */
         foreach ($this->long_term_measurements as $stock_stats) {
-            $change         = $stock_stats->change();
+            $change = $stock_stats->change();
             $change_percent = $stock_stats->changePercent();
 
             if (null === $this->max_change_amount || $change > $this->max_change_amount) {
@@ -73,7 +72,7 @@ class SignalExtractRequest
             }
         }
 
-        $this->diff_change_amount  = $this->max_change_amount - $this->min_change_amount;
+        $this->diff_change_amount = $this->max_change_amount - $this->min_change_amount;
         $this->diff_change_percent = $this->max_change_percent - $this->min_change_percent;
     }
 }

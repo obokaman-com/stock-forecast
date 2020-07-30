@@ -2,11 +2,9 @@
 
 namespace App\Controller\Telegram\Callback;
 
-
 use Obokaman\StockForecast\Domain\Model\Subscriber\ChatId;
 use Obokaman\StockForecast\Domain\Model\Subscriber\SubscriberExistsException;
 use Obokaman\StockForecast\Domain\Model\Subscriber\SubscriberRepository;
-use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Types\CallbackQuery;
 
@@ -43,8 +41,7 @@ class SubscribeCancelCallback extends BaseCallback
             $chat_id,
             $a_callback->getMessage()->getMessageId(),
             $response,
-            'Markdown');
+            'Markdown'
+        );
     }
-
-
 }

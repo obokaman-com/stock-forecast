@@ -2,13 +2,17 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Date;
 
+use DateInterval;
+use InvalidArgumentException;
+
+use function in_array;
+
 final class Interval
 {
-    public const  DAYS            = 'days';
-    public const  HOURS           = 'hours';
-    public const  MINUTES         = 'minutes';
+    public const  DAYS = 'days';
+    public const  HOURS = 'hours';
+    public const  MINUTES = 'minutes';
     private const VALID_INTERVALS = [self::DAYS, self::HOURS, self::MINUTES];
-
     private $interval;
 
     private function __construct(string $date_interval)
@@ -20,8 +24,8 @@ final class Interval
 
     private function validateDateInterval(string $date_interval): void
     {
-        if (!\in_array($date_interval, self::VALID_INTERVALS, true)) {
-            throw new \InvalidArgumentException('Invalid date interval: ' . $date_interval . '. Valid intervals include: ' . implode(', ', self::VALID_INTERVALS));
+        if (!in_array($date_interval, self::VALID_INTERVALS, true)) {
+            throw new InvalidArgumentException('Invalid date interval: ' . $date_interval . '. Valid intervals include: ' . implode(', ', self::VALID_INTERVALS));
         }
     }
 
@@ -30,7 +34,7 @@ final class Interval
         return new self($date_interval);
     }
 
-    public static function fromDateInterval(\DateInterval $a_date_interval): Interval
+    public static function fromDateInterval(DateInterval $a_date_interval): Interval
     {
         if (0 < $a_date_interval->d) {
             return new self(self::DAYS);
@@ -42,7 +46,7 @@ final class Interval
             return new self(self::MINUTES);
         }
 
-        throw new \InvalidArgumentException('Given date interval is invalid');
+        throw new InvalidArgumentException('Given date interval is invalid');
     }
 
     public function isDays(): bool

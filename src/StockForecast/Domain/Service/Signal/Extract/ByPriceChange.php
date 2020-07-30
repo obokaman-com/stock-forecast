@@ -2,7 +2,6 @@
 
 namespace Obokaman\StockForecast\Domain\Service\Signal\Extract;
 
-
 use Obokaman\StockForecast\Domain\Model\Financial\Signal;
 use Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements;
 

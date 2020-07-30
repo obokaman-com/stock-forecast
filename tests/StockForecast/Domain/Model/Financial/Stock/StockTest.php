@@ -25,6 +25,6 @@ class StockTest extends TestCase
 
     private function thenIObtainAValidStock(string $stock_code)
     {
-        $this->assertEquals($stock_code, (string) $this->stock);
+        $this->assertEquals($stock_code, (string)$this->stock);
     }
 }

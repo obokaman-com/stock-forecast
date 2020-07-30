@@ -25,7 +25,6 @@ final class Signals extends Command
     ];
     private $stock_predict_service;
     private $get_signals_service;
-
     /** @var InputInterface */
     private $input;
     /** @var OutputInterface */
@@ -36,7 +35,7 @@ final class Signals extends Command
         GetSignalsFromMeasurements $a_get_signals_service
     ) {
         $this->stock_predict_service = $a_stock_predict_service;
-        $this->get_signals_service   = $a_get_signals_service;
+        $this->get_signals_service = $a_get_signals_service;
 
         parent::__construct();
     }
@@ -51,9 +50,9 @@ final class Signals extends Command
              ->addOption('table_output', 't', InputOption::VALUE_NONE, 'Should output forecast table?');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->input  = $input;
+        $this->input = $input;
         $this->output = $output;
 
         $pairs = self::DEFAULT_PAIRS;
@@ -64,6 +63,8 @@ final class Signals extends Command
         foreach ($pairs as $pair) {
             $this->outputPairSignals($pair[0], $pair[1]);
         }
+
+        return 0;
     }
 
     private function outputPairSignals(string $currency, string $stock): void
@@ -81,21 +82,22 @@ final class Signals extends Command
         $this->output->writeln('');
     }
 
-
     private function outputForecastTable(Measurement ...$stock_stats): void
     {
         $table = new Table($this->output);
-        $table->setHeaders([
-            'Date interval',
-            'Open',
-            'Close',
-            'Change',
-            'Change (%)',
-            'High',
-            'Low',
-            'Volatility',
-            'Volume'
-        ]);
+        $table->setHeaders(
+            [
+                'Date interval',
+                'Open',
+                'Close',
+                'Change',
+                'Change (%)',
+                'High',
+                'Low',
+                'Volatility',
+                'Volume'
+            ]
+        );
 
         $this->addTableRow($table, 'Short term', $stock_stats[0]);
         $this->addTableRow($table, 'Medium term', $stock_stats[1]);
@@ -106,17 +108,19 @@ final class Signals extends Command
 
     private function addTableRow(Table $table, string $label, Measurement $stats): void
     {
-        $table->addRow([
-            $label,
-            $stats->open(),
-            $stats->close(),
-            $stats->change(),
-            $stats->changePercent() . '%',
-            $stats->high(),
-            $stats->low(),
-            $stats->volatility(),
-            $stats->volume()
-        ]);
+        $table->addRow(
+            [
+                $label,
+                $stats->open(),
+                $stats->close(),
+                $stats->change(),
+                $stats->changePercent() . '%',
+                $stats->high(),
+                $stats->low(),
+                $stats->volatility(),
+                $stats->volume()
+            ]
+        );
     }
 
     private function outputSignalsBasedOn(
@@ -125,18 +129,24 @@ final class Signals extends Command
         string $currency,
         string $stock
     ): void {
-        $prediction_request  = new PredictStockValueRequest($currency, $stock, $interval_unit);
+        $prediction_request = new PredictStockValueRequest($currency, $stock, $interval_unit);
         $prediction_response = $this->stock_predict_service->predict($prediction_request);
 
         $signals = $this->get_signals_service->getSignals($prediction_response->realMeasurements());
 
-        $this->output->writeln('<options=bold>Signals based on last ' . $interval . ' (Score: ' . CalculateScore::calculate(...
-                $signals) . '):</>');
+        $this->output->writeln(
+            '<options=bold>Signals based on last ' . $interval . ' (Score: ' . CalculateScore::calculate(
+                ...
+                $signals
+            ) . '):</>'
+        );
 
         if ($this->input->getOption('table_output')) {
-            $this->outputForecastTable($prediction_response->shortTermPredictions(),
+            $this->outputForecastTable(
+                $prediction_response->shortTermPredictions(),
                 $prediction_response->mediumTermPredictions(),
-                $prediction_response->longTermPredictions());
+                $prediction_response->longTermPredictions()
+            );
         }
 
         foreach ($signals as $signal) {

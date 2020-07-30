@@ -8,7 +8,6 @@ final class CumulativeMovingAverage implements PredictionStrategy
 {
     /** @var array */
     private $data_sequence;
-
     private $least_square_prediction_strategy;
 
     public function __construct(LeastSquares $a_least_square_prediction_strategy)
@@ -28,11 +27,11 @@ final class CumulativeMovingAverage implements PredictionStrategy
 
     public function predictNext(int $quantity = 1): array
     {
-        $last_average                             = 0;
+        $last_average = 0;
         $normalized_by_cumulative_average_samples = [];
 
         foreach ($this->data_sequence as $key => $value) {
-            $last_average                               = $this->cumulativeMovingAverage($value, $last_average, $key + 1);
+            $last_average = $this->cumulativeMovingAverage($value, $last_average, $key + 1);
             $normalized_by_cumulative_average_samples[] = $last_average;
         }
 

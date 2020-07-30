@@ -2,6 +2,10 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Financial;
 
+use InvalidArgumentException;
+
+use function in_array;
+
 final class Currency
 {
     private const VALID_CURRENCIES = ['EUR', 'USD', 'GBP'];
@@ -23,8 +27,8 @@ final class Currency
 
     private static function assertValidCurrency(string $a_code): void
     {
-        if (!\in_array($a_code, self::VALID_CURRENCIES, true)) {
-            throw new \InvalidArgumentException($a_code . ' is not a valid currency.');
+        if (!in_array($a_code, self::VALID_CURRENCIES, true)) {
+            throw new InvalidArgumentException($a_code . ' is not a valid currency.');
         }
     }
 

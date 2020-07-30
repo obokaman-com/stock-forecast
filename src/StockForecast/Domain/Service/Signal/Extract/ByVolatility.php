@@ -18,7 +18,11 @@ class ByVolatility implements SignalExtract
         }
 
         if ($this->hasHighVolatility()) {
-            return [Signal::NEUTRAL('High volatility during this period: Max increase: ' . $this->request->max_change_amount . '%, Max. decrease: ' . $this->request->min_change_amount . '%.')];
+            return [
+                Signal::NEUTRAL(
+                    'High volatility during this period: Max increase: ' . $this->request->max_change_amount . '%, Max. decrease: ' . $this->request->min_change_amount . '%.'
+                )
+            ];
         }
 
         return null;

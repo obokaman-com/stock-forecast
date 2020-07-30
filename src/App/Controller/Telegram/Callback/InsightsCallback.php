@@ -2,7 +2,7 @@
 
 namespace App\Controller\Telegram\Callback;
 
-
+use Exception;
 use Obokaman\StockForecast\Domain\Model\Date\Interval;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
@@ -23,7 +23,7 @@ class InsightsCallback extends BaseCallback
     {
         parent::__construct($a_telegram_client);
         $this->measurement_collector = $a_stock_measurement_collector;
-        $this->get_signals_service   = $a_get_signals_service;
+        $this->get_signals_service = $a_get_signals_service;
     }
 
     public function getCallback(): string
@@ -36,13 +36,14 @@ class InsightsCallback extends BaseCallback
         $callback_data = $this->getCallbackData($a_callback);
 
         $currency = $callback_data['currency'];
-        $crypto   = $callback_data['crypto'];
+        $crypto = $callback_data['crypto'];
 
         $this->telegram_client->editMessageText(
             $a_callback->getMessage()->getChat()->getId(),
             $a_callback->getMessage()->getMessageId(),
             sprintf('I\'ll give you some insights for *%s-%s*:', $currency, $crypto),
-            'Markdown');
+            'Markdown'
+        );
 
         try {
             $signals_message = $this->outputSignalsBasedOn('hour', Interval::MINUTES, $currency, $crypto);
@@ -55,23 +56,25 @@ class InsightsCallback extends BaseCallback
                 'Markdown',
                 false,
                 null,
-                new InlineKeyboardMarkup([
+                new InlineKeyboardMarkup(
                     [
                         [
-                            'text' => '📈 View ' . $currency . '-' . $crypto . ' chart online »',
-                            'url'  => 'https://www.cryptocompare.com/coins/' . strtolower($crypto) . '/charts/' . strtolower($currency)
+                            [
+                                'text' => '📈 View ' . $currency . '-' . $crypto . ' chart online »',
+                                'url' => 'https://www.cryptocompare.com/coins/' . strtolower($crypto) . '/charts/' . strtolower($currency)
+                            ]
                         ]
                     ]
-                ]));
+                )
+            );
         } catch (TelegramException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->telegram_client->sendMessage(
                 $a_callback->getMessage()->getChat()->getId(),
                 'There was an error: ' . $e->getMessage()
             );
         }
-
     }
 
     public function outputSignalsBasedOn(string $interval, string $interval_unit, string $currency, string $stock): string

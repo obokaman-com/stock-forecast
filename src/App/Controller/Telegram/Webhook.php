@@ -2,9 +2,12 @@
 
 namespace App\Controller\Telegram;
 
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use TelegramBot\Api\Client;
+
+use function get_class;
 
 class Webhook
 {
@@ -17,8 +20,8 @@ class Webhook
         Command $some_telegram_commands,
         Callback $some_telegram_callbacks
     ) {
-        $this->telegram_client    = $a_telegram_client;
-        $this->telegram_commands  = $some_telegram_commands;
+        $this->telegram_client = $a_telegram_client;
+        $this->telegram_commands = $some_telegram_commands;
         $this->telegram_callbacks = $some_telegram_callbacks;
     }
 
@@ -34,11 +37,13 @@ class Webhook
             $this->telegram_commands->configure();
             $this->telegram_callbacks->configure();
             $this->telegram_client->run();
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'error'   => \get_class($e),
-                'message' => $e->getMessage()
-            ]);
+        } catch (Exception $e) {
+            return new JsonResponse(
+                [
+                    'error' => get_class($e),
+                    'message' => $e->getMessage()
+                ]
+            );
         }
 
         return new JsonResponse([]);

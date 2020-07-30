@@ -2,7 +2,6 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Subscriber;
 
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
@@ -16,7 +15,6 @@ class Subscriber
     private $first_name;
     private $last_name;
     private $language;
-
     /** @var ArrayCollection|PersistentCollection|Subscription[] */
     private $subscriptions;
 
@@ -29,12 +27,12 @@ class Subscriber
         ?string $language,
         array $subscriptions
     ) {
-        $this->id            = $subscriberId;
-        $this->chat_id       = $chat_id;
-        $this->username      = $username;
-        $this->first_name    = $first_name;
-        $this->last_name     = $last_name;
-        $this->language      = $language;
+        $this->id = $subscriberId;
+        $this->chat_id = $chat_id;
+        $this->username = $username;
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
+        $this->language = $language;
         $this->subscriptions = new ArrayCollection($subscriptions);
     }
 

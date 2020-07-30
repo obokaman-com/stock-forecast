@@ -2,6 +2,7 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Financial\Stock;
 
+use DateTimeImmutable;
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 
 final class Measurement
@@ -19,7 +20,7 @@ final class Measurement
     public function __construct(
         Currency $a_currency,
         Stock $a_stock,
-        \DateTimeImmutable $a_timestamp,
+        DateTimeImmutable $a_timestamp,
         float $an_open,
         float $a_close,
         float $a_high,
@@ -27,15 +28,15 @@ final class Measurement
         float $a_volume_from,
         float $a_volume_to
     ) {
-        $this->currency    = $a_currency;
-        $this->stock       = $a_stock;
-        $this->timestamp   = $a_timestamp;
-        $this->close       = $a_close;
-        $this->high        = $a_high;
-        $this->low         = $a_low;
-        $this->open        = $an_open;
+        $this->currency = $a_currency;
+        $this->stock = $a_stock;
+        $this->timestamp = $a_timestamp;
+        $this->close = $a_close;
+        $this->high = $a_high;
+        $this->low = $a_low;
+        $this->open = $an_open;
         $this->volume_from = $a_volume_from;
-        $this->volume_to   = $a_volume_to;
+        $this->volume_to = $a_volume_to;
     }
 
     public function currency(): Currency
@@ -48,7 +49,7 @@ final class Measurement
         return $this->stock;
     }
 
-    public function timestamp(): \DateTimeImmutable
+    public function timestamp(): DateTimeImmutable
     {
         return $this->timestamp;
     }

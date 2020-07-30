@@ -19,30 +19,37 @@ class SubscribeCommand extends BaseCommand
         return function (TelegramMessage $message) use ($bot) {
             $chat_id = $message->getChat()->getId();
 
-            $bot->sendMessage($chat_id,
+            $bot->sendMessage(
+                $chat_id,
                 'Ok, choose an option:',
                 null,
                 false,
                 null,
-                new InlineKeyboardMarkup([
+                new InlineKeyboardMarkup(
                     [
                         [
-                            'text'          => 'Add subscription ▶︎',
-                            'callback_data' => json_encode([
-                                'method' => 'subscribe_add'
-                            ])
-                        ]
-                    ],
-                    [
+                            [
+                                'text' => 'Add subscription ▶︎',
+                                'callback_data' => json_encode(
+                                    [
+                                        'method' => 'subscribe_add'
+                                    ]
+                                )
+                            ]
+                        ],
                         [
-                            'text'          => 'Manage subscriptions ▶︎',
-                            'callback_data' => json_encode([
-                                'method' => 'subscribe_manage'
-                            ])
+                            [
+                                'text' => 'Manage subscriptions ▶︎',
+                                'callback_data' => json_encode(
+                                    [
+                                        'method' => 'subscribe_manage'
+                                    ]
+                                )
+                            ]
                         ]
                     ]
-                ]));
+                )
+            );
         };
     }
-
 }

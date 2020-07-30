@@ -2,7 +2,6 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Subscriber;
 
-
 use Obokaman\StockForecast\Domain\Model\Financial\Currency;
 use Obokaman\StockForecast\Domain\Model\Financial\Stock\Stock;
 
@@ -15,8 +14,8 @@ class Subscription
     public function __construct(Subscriber $a_subscriber, Currency $currency, Stock $stock)
     {
         $this->subscriber = $a_subscriber;
-        $this->currency   = $currency;
-        $this->stock      = $stock;
+        $this->currency = $currency;
+        $this->stock = $stock;
     }
 
     public function subscriber(): Subscriber

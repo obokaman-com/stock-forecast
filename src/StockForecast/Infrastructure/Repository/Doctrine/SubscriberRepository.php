@@ -14,13 +14,12 @@ class SubscriberRepository implements SubscriberRepositoryContract
 {
     /** @var EntityManagerInterface */
     private $em;
-
     /** @var ObjectRepository */
     private $repo;
 
     public function __construct(ManagerRegistry $a_manager_registry)
     {
-        $this->em   = $a_manager_registry->getManagerForClass(Subscriber::class);
+        $this->em = $a_manager_registry->getManagerForClass(Subscriber::class);
         $this->repo = $this->em->getRepository(Subscriber::class);
     }
 

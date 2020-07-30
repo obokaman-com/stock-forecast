@@ -2,7 +2,6 @@
 
 namespace App\Controller\Telegram\Callback;
 
-
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
@@ -23,44 +22,54 @@ class SubscribeAskStock extends BaseCallback
             'Ok, now select the crypto:',
             null,
             false,
-            new InlineKeyboardMarkup([
+            new InlineKeyboardMarkup(
                 [
                     [
-                        'text'          => 'BTC',
-                        'callback_data' => json_encode([
-                            'method'   => 'subscribe',
-                            'currency' => $callback_data['currency'],
-                            'crypto'   => 'BTC'
-                        ])
+                        [
+                            'text' => 'BTC',
+                            'callback_data' => json_encode(
+                                [
+                                    'method' => 'subscribe',
+                                    'currency' => $callback_data['currency'],
+                                    'crypto' => 'BTC'
+                                ]
+                            )
+                        ],
+                        [
+                            'text' => 'ETH',
+                            'callback_data' => json_encode(
+                                [
+                                    'method' => 'subscribe',
+                                    'currency' => $callback_data['currency'],
+                                    'crypto' => 'ETH'
+                                ]
+                            )
+                        ]
                     ],
                     [
-                        'text'          => 'ETH',
-                        'callback_data' => json_encode([
-                            'method'   => 'subscribe',
-                            'currency' => $callback_data['currency'],
-                            'crypto'   => 'ETH'
-                        ])
+                        [
+                            'text' => 'XRP',
+                            'callback_data' => json_encode(
+                                [
+                                    'method' => 'subscribe',
+                                    'currency' => $callback_data['currency'],
+                                    'crypto' => 'XRP'
+                                ]
+                            )
+                        ],
+                        [
+                            'text' => 'LTC',
+                            'callback_data' => json_encode(
+                                [
+                                    'method' => 'subscribe',
+                                    'currency' => $callback_data['currency'],
+                                    'crypto' => 'LTC'
+                                ]
+                            )
+                        ],
                     ]
-                ],
-                [
-                    [
-                        'text'          => 'XRP',
-                        'callback_data' => json_encode([
-                            'method'   => 'subscribe',
-                            'currency' => $callback_data['currency'],
-                            'crypto'   => 'XRP'
-                        ])
-                    ],
-                    [
-                        'text'          => 'LTC',
-                        'callback_data' => json_encode([
-                            'method'   => 'subscribe',
-                            'currency' => $callback_data['currency'],
-                            'crypto'   => 'LTC'
-                        ])
-                    ],
                 ]
-            ]));
+            )
+        );
     }
-
 }

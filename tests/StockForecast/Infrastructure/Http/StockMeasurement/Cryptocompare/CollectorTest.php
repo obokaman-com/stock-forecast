@@ -23,7 +23,7 @@ class CollectorTest extends TestCase
 
     private function whenICollectStockStats()
     {
-        $this->collector         = new CollectorTestClass();
+        $this->collector = new CollectorTestClass();
         $this->stock_stats_array = $this->collector->getMeasurements(
             Currency::fromCode('USD'),
             Stock::fromCode('BTC'),
@@ -43,17 +43,16 @@ class CollectorTestClass extends Collector
     {
         $results = [
             [
-                'time'       => 1504656000,
-                'close'      => 4616.18,
-                'high'       => 4692,
-                'low'        => 4431,
-                'open'       => 4432.51,
+                'time' => 1504656000,
+                'close' => 4616.18,
+                'high' => 4692,
+                'low' => 4431,
+                'open' => 4432.51,
                 'volumefrom' => 15975.31,
-                'volumeto'   => 73082808.58
+                'volumeto' => 73082808.58
             ]
         ];
 
         return $results;
     }
-
 }

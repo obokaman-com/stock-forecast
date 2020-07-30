@@ -2,7 +2,13 @@
 
 namespace Obokaman\StockForecast\Domain\Model\Kernel;
 
-abstract class Collection implements \Iterator, \Countable, \ArrayAccess
+use ArrayAccess;
+use Countable;
+use InvalidArgumentException;
+use Iterator;
+use RuntimeException;
+
+abstract class Collection implements Iterator, Countable, ArrayAccess
 {
     /** @var array */
     protected $all_items = [];
@@ -45,7 +51,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
         $key = $this->getKey($item);
 
         if (!isset($this->all_items[$key])) {
-            throw new \RuntimeException("Item with key {$key} doesn't exist in " . static::class);
+            throw new RuntimeException("Item with key {$key} doesn't exist in " . static::class);
         }
 
         return $this->all_items[$key];
@@ -58,7 +64,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
         $key = $this->getKey($item);
 
         if (!isset($this->all_items[$key])) {
-            throw new \RuntimeException("Item with key {$key} doesn't exist in " . static::class);
+            throw new RuntimeException("Item with key {$key} doesn't exist in " . static::class);
         }
 
         unset($this->all_items[$key]);
@@ -72,13 +78,13 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
     /** @return string */
     protected function getItemsClassName(): string
     {
-        throw new \RuntimeException('You should redefine ' . __METHOD__ . ' when extending from Collection');
+        throw new RuntimeException('You should redefine ' . __METHOD__ . ' when extending from Collection');
     }
 
     /** @return string */
     protected function getKey($item): string
     {
-        throw new \RuntimeException('You should redefine ' . __METHOD__ . ' when extending from Collection');
+        throw new RuntimeException('You should redefine ' . __METHOD__ . ' when extending from Collection');
     }
 
     private function validateItem($item)
@@ -93,7 +99,7 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
             return;
         }
 
-        throw new \InvalidArgumentException('Invalid item type. Should be instance of ' . $class_name);
+        throw new InvalidArgumentException('Invalid item type. Should be instance of ' . $class_name);
     }
 
     public function append(Collection $a_collection)

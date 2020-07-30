@@ -1,33 +1,33 @@
 Obokaman\StockForecast\Domain\Model\Subscriber\Subscriber:
-    type: entity
+  type: entity
+  id:
     id:
-        id:
-            type: subscriber_id
-            strategy: NONE
-    fields:
-        chat_id:
-            type: chat_id
-            length: 255
-        username:
-            type: string
-            length: 255
-            nullable: true
-        first_name:
-            type: string
-            length: 255
-            nullable: true
-        last_name:
-            type: string
-            length: 255
-            nullable: true
-        language:
-            type: string
-            length: 2
-            nullable: true
-    oneToMany:
-        subscriptions:
-            fetch: EAGER
-            targetEntity: Obokaman\StockForecast\Domain\Model\Subscriber\Subscription
-            mappedBy: subscriber
-            orphanRemoval: true
-            cascade: ['all']
+      type: subscriber_id
+      strategy: NONE
+  fields:
+    chat_id:
+      type: chat_id
+      length: 255
+    username:
+      type: string
+      length: 255
+      nullable: true
+    first_name:
+      type: string
+      length: 255
+      nullable: true
+    last_name:
+      type: string
+      length: 255
+      nullable: true
+    language:
+      type: string
+      length: 2
+      nullable: true
+  oneToMany:
+    subscriptions:
+      fetch: EAGER
+      targetEntity: Obokaman\StockForecast\Domain\Model\Subscriber\Subscription
+      mappedBy: subscriber
+      orphanRemoval: true
+      cascade: ['all']
