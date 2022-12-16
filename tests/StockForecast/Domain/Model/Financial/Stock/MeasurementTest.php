@@ -55,14 +55,14 @@ class MeasurementTest extends WebTestCase
         $this->assertInstanceOf(Currency::class, $this->measurement->currency());
         $this->assertInstanceOf(Stock::class, $this->measurement->stock());
         $this->assertInstanceOf(DateTimeImmutable::class, $this->measurement->timestamp());
-        $this->assertInternalType('float', $this->measurement->open());
-        $this->assertInternalType('float', $this->measurement->close());
-        $this->assertInternalType('float', $this->measurement->change());
-        $this->assertInternalType('float', $this->measurement->high());
-        $this->assertInternalType('float', $this->measurement->low());
-        $this->assertInternalType('float', $this->measurement->volatility());
-        $this->assertInternalType('float', $this->measurement->volume());
-        $this->assertInternalType('float', $this->measurement->volumeFrom());
-        $this->assertInternalType('float', $this->measurement->volumeTo());
+        $this->assertIsFloat($this->measurement->open());
+        $this->assertIsFloat($this->measurement->close());
+        $this->assertIsFloat( $this->measurement->change());
+        $this->assertIsFloat($this->measurement->high());
+        $this->assertIsFloat($this->measurement->low());
+        $this->assertIsFloat($this->measurement->volatility());
+        $this->assertIsFloat($this->measurement->volume());
+        $this->assertIsFloat($this->measurement->volumeFrom());
+        $this->assertIsFloat($this->measurement->volumeTo());
     }
 }

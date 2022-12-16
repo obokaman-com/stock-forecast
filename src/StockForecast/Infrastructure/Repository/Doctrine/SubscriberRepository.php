@@ -2,7 +2,7 @@
 
 namespace Obokaman\StockForecast\Infrastructure\Repository\Doctrine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Obokaman\StockForecast\Domain\Model\Subscriber\ChatId;

@@ -2,29 +2,37 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": "^7.2",
+        "php": "^8.1",
         "ext-json": "*",
-        "php-ai/php-ml": "^0.5",
+        "php-ai/php-ml": "^0.10.0",
+        "composer/package-versions-deprecated": "1.11.99.5",
+        "doctrine/doctrine-bundle": "^2",
+        "doctrine/doctrine-migrations-bundle": "^2",
+        "doctrine/orm": "^2",
         "ramsey/uuid": "^3.8",
         "symfony/console": "^5.0",
         "symfony/dotenv": "^5.0",
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^5.0",
-        "symfony/orm-pack": "^1.0",
         "symfony/yaml": "^5.0",
-        "telegram-bot/api": "^2.3"
+        "telegram-bot/api": "^2.3",
+        "rubix/ml": "^2.2"
     },
     "require-dev": {
         "symfony/browser-kit": "^5.1",
         "symfony/css-selector": "^5.1",
         "symfony/phpunit-bridge": "^5.1",
-        "symfony/var-dumper": "^5.0"
+        "symfony/var-dumper": "^5.0",
+        "phpunit/phpunit": "^8.5.12"
     },
     "config": {
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/flex": false
+        }
     },
     "autoload": {
         "psr-4": {
