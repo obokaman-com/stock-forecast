@@ -29,9 +29,14 @@ services:
 
     # Define an alias for this interface, so we can take profit of autowire to change the
     # implementation we want to use for the prediction strategy.
+    Obokaman\StockForecast\Domain\Service\Predict\Strategy\LeastSquares: '@Obokaman\StockForecast\Infrastructure\MachineLearning\PhpMl\LeastSquares'
+    #Obokaman\StockForecast\Domain\Service\Predict\Strategy\LeastSquares: '@Obokaman\StockForecast\Infrastructure\MachineLearning\Rubix\Ridge'
+    
     #Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Domain\Service\Predict\Strategy\CumulativeMovingAverage'
     Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Infrastructure\MachineLearning\PhpMl\LeastSquares'
     #Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Infrastructure\MachineLearning\PhpMl\SupportVectorRegression'
+    #Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Infrastructure\MachineLearning\Rubix\Ridge'
+    #Obokaman\StockForecast\Domain\Service\Predict\PredictionStrategy: '@Obokaman\StockForecast\Infrastructure\MachineLearning\Rubix\SVR'
 
     Obokaman\StockForecast\Domain\Service\Signal\GetSignalsFromMeasurements:
         arguments:

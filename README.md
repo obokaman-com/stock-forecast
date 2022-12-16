@@ -12,9 +12,9 @@ Next steps:
 
 ## Installation
 
-**Install PHP 7.2 and Git in your local machine** *(Example for Mac)*
+**Install PHP 8.1 and Git in your local machine** *(Example for Mac)*
 
-Install Homebrew (package manager) if you don't have it yet, and install Git + PHP 7.2 + Composer:
+Install Homebrew (package manager) if you don't have it yet, and install Git + PHP 8.1 + Composer:
 
 ```bash
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)`
@@ -28,6 +28,13 @@ $ git clone https://github.com/obokaman-com/stock-forecast
 $ cd stock-forecast
 $ composer install
 ```
+
+#### API keys
+
+This code uses the CryptoCompare API, for large number of queries you will need to register an API key at http://www.cryptocompare.com and set it in `.env`.
+
+Similarly, you will need to set a Telegram bot key in .env to use the Telegram functionality.
+
 
 ## Examples
 
